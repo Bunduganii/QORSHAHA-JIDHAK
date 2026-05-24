@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from "react";
-import { json } from "body-parser";
+
 
 
   // Story data
@@ -36,6 +36,8 @@ export default function Questions() {
   const [unit, setUnit] = useState("kg");
 const [weight, setWeight] = useState(75);
 const [challenge, setChallenge] = useState("");
+const [height, setHeight] = useState(178);
+const [birthDate, setBirthDate] = useState("");
 // SAVES QUESTIONS INTO LOCAL HOST
 useEffect(()=>{
   const SavedData = localStorage.getItem("Qorshah-jidhka-user")
@@ -51,6 +53,7 @@ useEffect(()=>{
       setChallenge(data.challenge || "")
     }
 },[])
+  const selectedStory = stories[goal] || null;
 useEffect(() => {
   const formData = {
     step,
@@ -77,23 +80,55 @@ useEffect(() => {
   weight,
   challenge,
 ]);
+ 
   const handleGoalSelect = (selectedGoal) => {
     setGoal(selectedGoal);
     setTimeout(() => {
-      setStep(2);
+      setStep(3);
     }, 500);
     console.log(selectedGoal)
   };
 const nextStep = () => {
-  if (step === 3) {
+  if (step === 4) {
     if (name.trim() === "") {
       toast.error("Fadlan geli magacaaga!");
       return;
     }
-    setStep(4);
+    setStep(5);
+    return;
   }
-//  whatsapp step error handlor
-  if (step === 4) {
+
+  if (step === 5) {
+    setStep(6); // birth -> height
+    return;
+  }
+
+  if (step === 6) {
+    setStep(7); // height -> weight
+    return;
+  }
+
+  if (step === 7) {
+    setStep(8); // weight -> whatsapp
+    return;
+  }
+
+  if (step === 8) {
+  
+  if (step === 8) {
+    setStep(9);
+    return;
+  }
+
+    setStep(9); // whatsapp -> experience
+    return;
+  }
+
+  if (step === 9) {
+    setStep(10); // experience -> challenge
+    return;
+  }
+    if (step === 10) {
     const error = validateWhatsApp(whatsapp);
 
     if (error) {
@@ -101,12 +136,9 @@ const nextStep = () => {
       return;
     }
 
-    setStep(5);
+    navigate("/Loading");
+    return;
   }
-  if (step === 5) {
-  setStep(6);
-  return;
-}
 };
 const validateWhatsApp = (number) => {
   const cleaned = number.replace(/\s+/g, ""); // remove spaces
@@ -122,8 +154,9 @@ const validateWhatsApp = (number) => {
   if (cleaned.length !== 12) {
     return "WhatsApp number waa inuu noqdaa 12 digit (25263XXXXXXX)!";
   }
-
+  
   return "";
+  
 };
 
   const prevStep = () => {
@@ -141,7 +174,7 @@ const validateWhatsApp = (number) => {
           <h4 className="q-brand">Qorshaha Jidhka</h4>
 
           <div className="q-progress">
-            <div className="q-progress-fill" style={{ width: `${(step / 5) * 100}%` }}></div>
+            <div className="q-progress-fill" style={{ width: `${(step / 10) * 100}%` }}></div>
           </div>
 
           <button className="q-close" onClick={()=> navigate('/')}>✕</button>
@@ -150,8 +183,8 @@ const validateWhatsApp = (number) => {
         {/* STEP CONTENT */}
         <div className="q-content">
 
-          {/* STEP 1 - GOAL */}
-          {step === 1 && (
+          {/* STEP 2 - GOAL we made step 2 becuse we have know first gender in oder to user gets correct story */}
+          {step === 2 && (
             <div className="q-step">
               <p className="q-coach">COACH Naasir</p>
 
@@ -216,8 +249,8 @@ const validateWhatsApp = (number) => {
               </div>
             </div>
           )}
-          {/* STEP 2 - GENDER */}
-{step === 2 && (
+          {/* STEP 2 - GENDER step we mad it step 1  becuse of story*/}
+{step === 1 && (
   <div className="gender-step">
 
     <div className="gender-header">
@@ -246,7 +279,7 @@ const validateWhatsApp = (number) => {
           setGender("Male");
 
           setTimeout(() => {
-            setStep(3);
+            setStep(2);
           }, 400);
         }}
       >
@@ -267,7 +300,7 @@ const validateWhatsApp = (number) => {
           setGender("Female");
 
           setTimeout(() => {
-            setStep(3);
+            setStep(2);
           }, 400);
         }}
       >
@@ -294,8 +327,8 @@ const validateWhatsApp = (number) => {
   </div>
 )}
 
-          {/* STEP 3 - NAME */}
-          {step === 3 && (
+          {/* STEP 4 - NAME */}
+          {step === 5 && (
             <div className="q-step">
               <p className="q-coach">COACH Naasir</p>
 
@@ -328,63 +361,86 @@ const validateWhatsApp = (number) => {
             </div>
           )}
 
-          {/* STEP 4 - WHATSAPP */}
-      {step === 4 && (
-  <div className="q-step">
-    <div className="q-coach-box">
-      <img
-        className="q-avatar"
-        src="/images/img-2.jpg"
-        alt="coach"
-      />
+          {/* STEP 5 - Height kii */}
+         {step === 6 && (
+  <div className="modern-step">
+    <div className="modern-head">
+      <p>ASSESSMENT</p>
+      <h1>
+        Goormaad <span>dhalatay?</span>
+      </h1>
+      <p className="modern-sub">
+        Taariikhda dhalashada waxay naga caawisaa inaan kuu xisaabino qorshe sax ah.
+      </p>
+    </div>
 
-      <div>
-        <p className="q-coach-name">COACH Naasir</p>
-        <p className="q-coach-role">Qorshaha Jidhka</p>
+    <div className="birth-card">
+      <h2>Marka hore noo sheeg dhalashadaada</h2>
+
+      <div className="birth-grid">
+        <div className="birth-field">
+          <label>Maalin</label>
+          <input type="number" placeholder="24" />
+        </div>
+
+        <div className="birth-field">
+          <label>Bil</label>
+          <input type="text" placeholder="OCT" />
+        </div>
+
+        <div className="birth-field">
+          <label>Sanad</label>
+          <input type="number" placeholder="1995" />
+        </div>
       </div>
-    </div>
 
-    <h1 className="q-title">
-      Geli <span>WhatsApp-kaaga</span>
-    </h1>
-
-    <p className="q-subtitle">
-      Waxaan WhatsApp kuu isticmaaleynaa si aan kuu soo dirno:
-      <br />
-      ✅ Plan-kaaga Fitness
-      <br />
-      ✅ Support joogto ah & reminders
-      <br />
-      ✅ Updates iyo talooyin
-      <br />
-      <br />
-      <span style={{ color: "#00ffa6", fontWeight: "700" }}>
-        Lambarkaaga lama wadaagi doono qof kale.
-      </span>
-    </p>
-
-    <div className="q-input-box">
-      <label>WhatsApp Number</label>
-      <input
-        type="text"
-        placeholder="+252 63 xxx xxxx"
-        value={whatsapp}
-        onChange={(e) => setWhatsapp(e.target.value)}
-      />
-    </div>
-
-    <div className="q-footer">
-      <button className="q-back" onClick={prevStep}>
-        ← Back
-      </button>
-      <button className="q-next" onClick={nextStep}>
-        Continue →
-      </button>
+      <div className="modern-actions">
+        <button className="q-back" onClick={prevStep}>Back</button>
+        <button className="q-next" onClick={nextStep}>Continue →</button>
+      </div>
     </div>
   </div>
 )}
-{/* step 5 */}
-       {step === 5 && (
+
+          {/* step 6 */}
+{step === 7 && (
+  <div className="modern-step">
+    <div className="modern-head">
+      <p>ASSESSMENT</p>
+      <h1>
+        Waa imisa <span>dhererkaagu?</span>
+      </h1>
+    </div>
+
+    <div className="height-card">
+      <div className="unit-switch">
+        <button className="active">CM</button>
+        <button>FT/IN</button>
+      </div>
+
+      <div className="height-display">
+        <h2>{height}</h2>
+        <span>CM</span>
+      </div>
+
+      <input
+        className="modern-range"
+        type="range"
+        min="140"
+        max="220"
+        value={height}
+        onChange={(e) => setHeight(e.target.value)}
+      />
+
+      <div className="modern-actions">
+        <button className="q-back" onClick={prevStep}>Back</button>
+        <button className="q-next" onClick={nextStep}>Continue →</button>
+      </div>
+    </div>
+  </div>
+)}
+{/* step 7 */}
+       {step === 8 && (
   <div className="q-step">
 
     <div className="q-coach-box">
@@ -484,18 +540,18 @@ const validateWhatsApp = (number) => {
     </div>
   </div>
 )}
-{step === 6 && (
+{step === 3 && selectedStory && (
   <div className="q-step">
 
     <p className="q-coach">Dad badan oo sidaadoo kale ah ayaa hore u gaaray natiijooyin muuqda</p>
 
     <div className="story-card">
-      <img src={stories[goal].image} alt="story" />
+      <img src={selectedStory.image} alt="story" />
 
       <div className="story-content">
-        <h2>{stories[goal].name}</h2>
+        <h2>{selectedStory?.name}</h2>
         <p>Before / After</p>
-        <h3>{stories[goal].result}</h3>
+        <h3>{selectedStory?.result}</h3>
       </div>
     </div>
 
@@ -504,13 +560,14 @@ const validateWhatsApp = (number) => {
         ← Back
       </button>
 
-      <button className="q-next" onClick={() => setStep(7)}>
+      <button className="q-next" onClick={() => setStep(4)}>
         Continue →
       </button>
     </div>
   </div>
 )}
-{step === 7 && (
+{/* challenge step last  step */}
+{step === 4 && (
   <div className="q-step">
     <h1 className="q-title">
       Caqabadda ugu weyn <span>waa maxay?</span>
@@ -528,12 +585,101 @@ const validateWhatsApp = (number) => {
           className={`q-option ${challenge === item ? "active" : ""}`}
           onClick={() => {
             setChallenge(item);
-            setTimeout(() => {navigate("/Loading")}, 400);
+            setTimeout(() => setStep(5), 400);
           }}
         >
           {item}
         </button>
       ))}
+    </div>
+  </div>
+)}
+      {step === 10 && (
+  <div className="q-step">
+    <div className="q-coach-box">
+      <img
+        className="q-avatar"
+        src="/images/img-2.jpg"
+        alt="coach"
+      />
+
+      <div>
+        <p className="q-coach-name">COACH Naasir</p>
+        <p className="q-coach-role">Qorshaha Jidhka</p>
+      </div>
+    </div>
+
+    <h1 className="q-title">
+      Geli <span>WhatsApp-kaaga</span>
+    </h1>
+
+    <p className="q-subtitle">
+      Waxaan WhatsApp kuu isticmaaleynaa si aan kuu soo dirno:
+      <br />
+      ✅ Plan-kaaga Fitness
+      <br />
+      ✅ Support joogto ah & reminders
+      <br />
+      ✅ Updates iyo talooyin
+      <br />
+      <br />
+      <span style={{ color: "#00ffa6", fontWeight: "700" }}>
+        Lambarkaaga lama wadaagi doono qof kale.
+      </span>
+    </p>
+
+    <div className="q-input-box">
+      <label>WhatsApp Number</label>
+      <input
+        type="text"
+        placeholder="+252 63 xxx xxxx"
+        value={whatsapp}
+        onChange={(e) => setWhatsapp(e.target.value)}
+      />
+    </div>
+
+    <div className="q-footer">
+      <button className="q-back" onClick={prevStep}>
+        ← Back
+      </button>
+      <button className="q-next"onClick={nextStep} >
+        Continue →
+      </button>
+    </div>
+  </div>
+)}
+{step === 9 && (
+  <div className="modern-step">
+    <div className="modern-head">
+      <p>ASSESSMENT PROGRESS</p>
+      <h1>
+        Heerkaaga <span>jimicsi?</span>
+      </h1>
+      <p className="modern-sub">
+        Waxaan rabnaa inaan ogaano heerkaaga si qorshaha kuu fududaado.
+      </p>
+    </div>
+
+    <div className="exp-grid">
+      {[
+        ["Bilow", "Hadda ayaan bilaabay"],
+        ["Dhexe", "Waxaan joogay 6+ bilood"],
+        ["Sare", "Waxaan leeyahay waayo-aragnimo"]
+      ].map(([title, desc]) => (
+        <div
+          key={title}
+          className={`exp-card ${challenge === title ? "active" : ""}`}
+          onClick={() => setChallenge(title)}
+        >
+          <h2>{title}</h2>
+          <p>{desc}</p>
+        </div>
+      ))}
+    </div>
+
+    <div className="modern-actions">
+      <button className="q-back" onClick={prevStep}>Back</button>
+      <button className="q-next" onClick={nextStep}>Continue →</button>
     </div>
   </div>
 )}

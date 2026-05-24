@@ -79,14 +79,14 @@ const HomePage = () => {
    <div className='card'>
    <div className='icon-card'><FaChartBar/></div>
    <h3>Tababar Cilimiyeysan</h3>
-   <p> Jimicsi Ku  si Cilmi ah  Dhisan Loo Habeeye Oo Ku Salaysan Jidhkkaga
+   <p> Jimicsi Ku  Dhisan si Cilmi ah   La Habeeye Oo Ku Salaysan Jidhkkaga
    </p>
    </div>
    <div className='card'>
   <div className='icon-card'> <FaUtensils/></div>
   <h3>Nafaqo Qorshaysan </h3>
   <p>Cunto Qorshaysan Oo Ku Haboon,Oo Ay Kuu Diyaariyeen Khubaro Nafaqo Si Ay Kuu Gaarsiyaan
-    DegDeg Ah Oo Caafimaad Leh
+    Jidhka Riyaadad DegDeg Ah Oo Caafimaad Leh
   </p>
    </div>
    <div className='card'>
@@ -113,7 +113,7 @@ const HomePage = () => {
     showStatus={false}
     infiniteLoop
     autoPlay
-    interval={3000}
+    interval={2000}
     swipeable
     emulateTouch
     showIndicators={true}

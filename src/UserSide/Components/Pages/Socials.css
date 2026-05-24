@@ -1,0 +1,415 @@
+.bulsho-page {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #07161d, #020406);
+  padding: 80px 30px;
+  color: white;
+}
+
+/* hero */
+
+.bulsho-hero {
+  max-width: 900px;
+  margin-bottom: 60px;
+}
+
+.hero-tag {
+  display: inline-block;
+  padding: 8px 18px;
+  border: 1px solid rgba(0, 217, 255, 0.3);
+  border-radius: 999px;
+  color: #00d9ff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bulsho-hero h1 {
+  font-size: 86px;
+  font-weight: 900;
+  margin-top: 25px;
+  line-height: 1;
+}
+
+.bulsho-hero h1 span {
+  color: #00d9ff;
+}
+
+.bulsho-hero h3 {
+  margin-top: 20px;
+  font-size: 42px;
+  letter-spacing: 6px;
+  opacity: 0.7;
+}
+
+.bulsho-hero p {
+  margin-top: 30px;
+  max-width: 700px;
+  font-size: 24px;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+/* main */
+
+.bulsho-main {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 25px;
+  margin-top: 50px;
+}
+
+.fariin-box {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 35px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.fariin-box h2 {
+  margin-bottom: 30px;
+  font-size: 36px;
+}
+
+.fariin-box input,
+.fariin-box textarea {
+  width: 100%;
+  margin-bottom: 18px;
+  background: #081017;
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  color: white;
+  font-size: 16px;
+}
+
+.fariin-box button {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  background: #00d9ff;
+  color: black;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.social-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.social-card {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.social-icon {
+  width: 55px;
+  height: 55px;
+  background: rgba(0, 217, 255, 0.1);
+  color: #00d9ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.social-card h3 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.social-card p {
+  opacity: 0.7;
+  margin-bottom: 30px;
+}
+
+.social-card button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  cursor: pointer;
+}
+
+/* bottom */
+
+.xog-box {
+  margin-top: 70px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  align-items: center;
+}
+
+.xog-left img {
+  width: 100%;
+  border-radius: 20px;
+}
+
+.xog-right {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 35px;
+  border-radius: 20px;
+}
+
+.xog-right h2 {
+  font-size: 58px;
+  margin-bottom: 35px;
+}
+
+.xog-right h2 span {
+  color: #00d9ff;
+}
+
+.xog-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 25px;
+}
+
+.xog-item svg {
+  color: #00d9ff;
+}
+
+/* Coaching style */
+.coach-wrap {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #07161d, #020406);
+  color: white;
+  padding: 25px;
+}
+
+/* top */
+
+.coach-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.coach-logo {
+  font-size: 32px;
+  font-weight: 900;
+}
+
+.coach-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #081017;
+  padding: 14px 18px;
+  border-radius: 12px;
+  width: 340px;
+}
+
+.coach-search input {
+  background: transparent;
+  border: none;
+  color: white;
+  outline: none;
+  width: 100%;
+}
+
+.top-icon {
+  color: #00d9ff;
+}
+
+/* hero */
+
+.coach-hero {
+  height: 360px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: url("/images/female.jpg") center/cover;
+  position: relative;
+  margin-bottom: 35px;
+}
+
+.hero-overlay {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 10, 15, 0.65);
+  padding: 50px;
+}
+
+.hero-tag {
+  color: #00d9ff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.hero-overlay h1 {
+  font-size: 88px;
+  font-weight: 900;
+  max-width: 600px;
+  line-height: 0.95;
+  margin: 20px 0;
+}
+
+.hero-overlay p {
+  max-width: 600px;
+  font-size: 24px;
+  opacity: 0.8;
+}
+
+/* filters */
+
+.filter-row {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.filter-row button {
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  cursor: pointer;
+}
+
+.active-filter {
+  background: #00d9ff !important;
+  color: black !important;
+}
+
+/* cards */
+
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.video-card {
+  background: rgba(255,255,255,0.03);
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: 0.3s;
+}
+
+.video-card:hover {
+  transform: translateY(-6px);
+}
+
+.video-thumb {
+  position: relative;
+  height: 220px;
+}
+
+.video-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-thumb span {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: black;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.video-body {
+  padding: 22px;
+}
+
+.video-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.video-head small {
+  color: #00d9ff;
+  font-weight: 700;
+}
+
+.video-body h3 {
+  font-size: 28px;
+  margin: 14px 0;
+}
+
+.video-body p {
+  opacity: 0.72;
+  line-height: 1.5;
+}
+
+.video-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.video-foot img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+@media (max-width: 992px) {
+  .video-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-overlay h1 {
+    font-size: 48px;
+  }
+
+  .coach-search {
+    display: none;
+  }
+}
+
+
+
+/* Coaching end style */
+
+
+
+
+
+
+
+
+
+/* mobile */
+
+@media (max-width: 768px) {
+  .bulsho-main,
+  .xog-box {
+    grid-template-columns: 1fr;
+  }
+
+  .social-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bulsho-hero h1 {
+    font-size: 52px;
+  }
+
+  .bulsho-hero h3 {
+    font-size: 28px;
+  }
+}

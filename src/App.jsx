@@ -16,6 +16,8 @@ import About from './UserSide/Components/Pages/About'
 import Payment from './UserSide/Components/Pages/Payment'
 import Plans from './UserSide/Components/Plans'
 import Loading from './UserSide/Components/Loading'
+import AdminLogin from './AdminSide/pages/AdminLogin'
+import AdminDashboard from './AdminSide/pages/AdDash'
 
 const App = () => {
   return (
@@ -37,6 +39,8 @@ const App = () => {
    <Route path='/payment' element={<Payment/>}/>
    <Route path='/plans' element={<Plans/>}/>
    <Route path='/Loading' element={<Loading/>}/>
+  <Route path='/admin' element={<AdminLogin/>}/>
+  <Route path='/admin-dashboard' element={<AdminDashboard/>}/>
     </Routes>
     </div>
     </>

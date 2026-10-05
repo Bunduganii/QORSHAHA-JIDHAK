@@ -32,6 +32,14 @@ class Config:
     COACH_NAME = os.getenv("COACH_NAME", "Coach Naasir")
     GMAIL_USER = os.getenv("GMAIL_USER", "hamsesaedsnm@gmail.com")
     GMAIL_PASS = os.getenv("GMAIL_PASS", "")
+
+    # Brevo Email API Configuration
+    BREVO_API_KEY = os.getenv("BREVO_API_KEY", "")
+    BREVO_SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL", os.getenv("GMAIL_USER", "info@qorshahajidhka.com"))
+    BREVO_SENDER_NAME = os.getenv("BREVO_SENDER_NAME", "Coach Naasir | Qorshaha Jidhka")
+
+    # Public Site URL
+    SITE_URL = os.getenv("SITE_URL", "http://localhost:5173")
     
     # Server port
     PORT = int(os.getenv("PORT", 5000))

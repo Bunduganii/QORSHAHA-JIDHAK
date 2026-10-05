@@ -135,6 +135,24 @@ const NewsletterSection = () => {
           </button>
         </form>
       )}
+
+      {/* Stitch Image 4 Micro Stats Footer */}
+      <div style={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        gap: "24px",
+        marginTop: "28px",
+        paddingTop: "20px",
+        borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+        fontSize: "11px",
+        color: "#8f9ca7",
+        letterSpacing: "0.5px"
+      }}>
+        <span>🛡️ 256-BIT ENCRYPTION</span>
+        <span>⚡ CADENCE: WEEKLY DISPATCH</span>
+        <span>📖 FORMAT: PEER-REVIEWED</span>
+      </div>
     </section>
   );
 };

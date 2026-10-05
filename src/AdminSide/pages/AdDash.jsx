@@ -1,11 +1,22 @@
 import { useState, useEffect, useCallback } from "react";
 import "./../pages/admin-dash.css";
-import { getDashboardStats, getPayments, getCoachClientByAccessCode, updatePaymentStatus } from "../Services/AdminService";
+import {
+  getDashboardStats,
+  getPayments,
+  getCoachClientByAccessCode,
+  updatePaymentStatus,
+  verifySifaloPayment,
+  getFullClientProfile
+} from "../Services/AdminService";
 import UploadPlan from "./UploadPlan";
 import BlogManagement from "./BlogManagement";
 import EmailManagement from "./EmailManagement";
 import toast from "react-hot-toast";
-import { FaSearch, FaKey, FaUserCheck, FaTimes, FaCheck, FaSync, FaChartLine, FaMoneyBillWave, FaEnvelope, FaNewspaper, FaDumbbell } from "react-icons/fa";
+import {
+  FaSearch, FaKey, FaUserCheck, FaTimes, FaCheck, FaSync,
+  FaChartLine, FaMoneyBillWave, FaEnvelope, FaNewspaper, FaDumbbell,
+  FaShieldAlt, FaSpinner, FaExternalLinkAlt
+} from "react-icons/fa";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard"); // 'dashboard' | 'payments' | 'articles' | 'emails'
@@ -80,6 +91,39 @@ const Dashboard = () => {
     } else {
       toast.error(res.error || "Access Code-ka lama helin!");
       setClientDetails(null);
+    }
+  };
+
+  const [verifyingOrderId, setVerifyingOrderId] = useState(null);
+
+  const handleLiveSifaloVerify = async (orderId) => {
+    setVerifyingOrderId(orderId);
+    toast.loading("Waxaa lala xiriirayaa Sifalo Pay Gateway API... ⏳", { id: "sifalo-verify" });
+    const res = await verifySifaloPayment(orderId);
+    setVerifyingOrderId(null);
+    toast.dismiss("sifalo-verify");
+
+    if (res.success) {
+      if (res.data?.payment_status === "PAID") {
+        toast.success(res.data.message || "Lacag bixinta waa la xaqiijiyay! PAID ✅");
+      } else {
+        toast(res.data?.message || "Lacag bixintu weli waa PENDING.", { icon: "ℹ️" });
+      }
+      loadData();
+      if (clientDetails && (clientDetails.order_id === orderId || clientDetails.payment_info?.order_id === orderId)) {
+        handleOpenProfile(orderId);
+      }
+    } else {
+      toast.error(res.error || "Sifalo Pay xaqiijintu way fashilantay.");
+    }
+  };
+
+  const handleOpenProfile = async (orderId) => {
+    const res = await getFullClientProfile(orderId);
+    if (res.success) {
+      setClientDetails(res.data);
+    } else {
+      toast.error("Xogta macmiilka lama helin.");
     }
   };
 
@@ -233,79 +277,195 @@ const Dashboard = () => {
         {/* TAB 3 & 4: DASHBOARD / PAYMENTS */}
         {(activeTab === "dashboard" || activeTab === "payments") && (
           <div className="dashboard-content">
-            {/* COACH ACCESS CODE MODAL DETAILS */}
+            {/* COACH ACCESS CODE & COMPREHENSIVE PROFILE MODAL (SECTION 11 & 23) */}
             {clientDetails && (
               <div style={{
-                background: "rgba(0, 217, 255, 0.05)",
+                background: "rgba(13, 28, 41, 0.95)",
                 border: "1px solid #00d9ff",
-                borderRadius: "14px",
-                padding: "24px",
+                borderRadius: "16px",
+                padding: "28px",
                 marginBottom: "28px",
-                position: "relative"
+                position: "relative",
+                boxShadow: "0 10px 40px rgba(0, 217, 255, 0.15)"
               }}>
                 <button
                   onClick={() => setClientDetails(null)}
                   style={{
                     position: "absolute",
-                    right: "16px",
-                    top: "16px",
-                    background: "transparent",
+                    right: "18px",
+                    top: "18px",
+                    background: "rgba(255,255,255,0.06)",
                     border: "none",
+                    borderRadius: "6px",
                     color: "#8f9ca7",
-                    fontSize: "18px",
-                    cursor: "pointer"
+                    fontSize: "16px",
+                    cursor: "pointer",
+                    padding: "6px 10px"
                   }}
                 >
                   <FaTimes />
                 </button>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
-                  <FaUserCheck color="#00ffa6" size={24} />
-                  <h3 style={{ color: "#fff", margin: 0 }}>Macmiilka: {clientDetails.customer_name}</h3>
-                  <span style={{
-                    background: clientDetails.payment_status === "PAID" ? "rgba(0, 255, 166, 0.15)" : "rgba(255, 193, 7, 0.15)",
-                    color: clientDetails.payment_status === "PAID" ? "#00ffa6" : "#ffc107",
-                    padding: "4px 10px",
-                    borderRadius: "6px",
-                    fontSize: "12px",
-                    fontWeight: "bold"
-                  }}>
-                    Status: {clientDetails.payment_status}
-                  </span>
-                </div>
-
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "20px" }}>
-                  <div>
-                    <span style={{ fontSize: "11px", color: "#8f9ca7", textTransform: "uppercase" }}>Access Code</span>
-                    <p style={{ fontSize: "16px", fontWeight: "bold", color: "#00d9ff", margin: "4px 0 0" }}>{clientDetails.access_code}</p>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: "11px", color: "#8f9ca7", textTransform: "uppercase" }}>WhatsApp Number</span>
-                    <p style={{ fontSize: "15px", fontWeight: "bold", color: "#fff", margin: "4px 0 0" }}>{clientDetails.whatsapp_phone}</p>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: "11px", color: "#8f9ca7", textTransform: "uppercase" }}>Payment Phone</span>
-                    <p style={{ fontSize: "15px", fontWeight: "bold", color: "#fff", margin: "4px 0 0" }}>{clientDetails.payment_phone || "—"}</p>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: "11px", color: "#8f9ca7", textTransform: "uppercase" }}>Plan Selected</span>
-                    <p style={{ fontSize: "15px", fontWeight: "bold", color: "#fff", margin: "4px 0 0" }}>{clientDetails.plan_name}</p>
-                  </div>
-                </div>
-
-                {clientDetails.questionnaire && (
-                  <div style={{ background: "rgba(0,0,0,0.3)", padding: "16px", borderRadius: "10px" }}>
-                    <h4 style={{ color: "#00ffa6", fontSize: "14px", marginBottom: "10px" }}>QORSHAHA JIDHKA — XOGTA SU'AALAHA MACMIILKA:</h4>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "12px", fontSize: "13px" }}>
-                      <div><strong style={{ color: "#8f9ca7" }}>Goal:</strong> {clientDetails.questionnaire.goal || "—"}</div>
-                      <div><strong style={{ color: "#8f9ca7" }}>Gender:</strong> {clientDetails.questionnaire.gender || "—"}</div>
-                      <div><strong style={{ color: "#8f9ca7" }}>Email:</strong> {clientDetails.questionnaire.email || "—"}</div>
-                      <div><strong style={{ color: "#8f9ca7" }}>Weight:</strong> {clientDetails.questionnaire.weight} {clientDetails.questionnaire.unit}</div>
-                      <div><strong style={{ color: "#8f9ca7" }}>Height:</strong> {clientDetails.questionnaire.height} {clientDetails.questionnaire.height_unit}</div>
-                      <div><strong style={{ color: "#8f9ca7" }}>Challenge:</strong> {clientDetails.questionnaire.challenge || "—"}</div>
+                {/* MODAL HEADER */}
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "24px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <FaUserCheck color="#00ffa6" size={26} />
+                    <div>
+                      <h2 style={{ color: "#fff", margin: 0, fontSize: "20px", fontWeight: "900" }}>
+                        {clientDetails.user_info?.name || clientDetails.customer_name || "Client Profile"}
+                      </h2>
+                      <span style={{ fontSize: "12px", color: "#8f9ca7" }}>
+                        ORDER: {clientDetails.order_id || clientDetails.payment_info?.order_id || "—"}
+                      </span>
                     </div>
                   </div>
-                )}
+
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{
+                      background: (clientDetails.payment_info?.payment_status || clientDetails.payment_status) === "PAID" ? "rgba(0, 255, 166, 0.15)" : "rgba(255, 193, 7, 0.15)",
+                      color: (clientDetails.payment_info?.payment_status || clientDetails.payment_status) === "PAID" ? "#00ffa6" : "#ffc107",
+                      border: (clientDetails.payment_info?.payment_status || clientDetails.payment_status) === "PAID" ? "1px solid rgba(0,255,166,0.3)" : "1px solid rgba(255,193,7,0.3)",
+                      padding: "6px 14px",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      fontWeight: "900"
+                    }}>
+                      PAYMENT: {clientDetails.payment_info?.payment_status || clientDetails.payment_status}
+                    </span>
+
+                    {(clientDetails.payment_info?.access_code || clientDetails.access_code) && (
+                      <span style={{
+                        background: "rgba(0, 217, 255, 0.15)",
+                        color: "#00d9ff",
+                        border: "1px solid rgba(0, 217, 255, 0.3)",
+                        padding: "6px 14px",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        fontWeight: "900",
+                        fontFamily: "monospace"
+                      }}>
+                        ACCESS: {clientDetails.payment_info?.access_code || clientDetails.access_code}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* 4 SECTION GRID (USER, FITNESS, PLAN, PAYMENT) */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px", marginBottom: "24px" }}>
+                  {/* 1. USER INFORMATION */}
+                  <div style={{ background: "rgba(0,0,0,0.3)", padding: "18px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <h4 style={{ color: "#00d9ff", fontSize: "12px", fontWeight: "900", letterSpacing: "1px", textTransform: "uppercase", marginBottom: "12px" }}>
+                      1. USER INFORMATION
+                    </h4>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px" }}>
+                      <div><strong style={{ color: "#8f9ca7" }}>Magaca:</strong> {clientDetails.user_info?.name || clientDetails.customer_name || "—"}</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Email:</strong> {clientDetails.user_info?.email || clientDetails.questionnaire?.email || "—"}</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>WhatsApp:</strong> {clientDetails.user_info?.whatsapp || clientDetails.whatsapp_phone || "—"}</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Payment Phone:</strong> {clientDetails.user_info?.payment_phone || clientDetails.payment_phone || "—"}</div>
+                    </div>
+                  </div>
+
+                  {/* 2. FITNESS INFORMATION */}
+                  <div style={{ background: "rgba(0,0,0,0.3)", padding: "18px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <h4 style={{ color: "#00ffa6", fontSize: "12px", fontWeight: "900", letterSpacing: "1px", textTransform: "uppercase", marginBottom: "12px" }}>
+                      2. FITNESS INFORMATION
+                    </h4>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px" }}>
+                      <div><strong style={{ color: "#8f9ca7" }}>Goal:</strong> {clientDetails.fitness_info?.goal || clientDetails.questionnaire?.goal || "—"}</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Gender:</strong> {clientDetails.fitness_info?.gender || clientDetails.questionnaire?.gender || "—"}</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Weight:</strong> {clientDetails.fitness_info?.weight || (clientDetails.questionnaire ? `${clientDetails.questionnaire.weight} ${clientDetails.questionnaire.unit}` : "—")}</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Height:</strong> {clientDetails.fitness_info?.height || (clientDetails.questionnaire ? `${clientDetails.questionnaire.height} ${clientDetails.questionnaire.height_unit}` : "—")}</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Challenge:</strong> {clientDetails.fitness_info?.challenge || clientDetails.questionnaire?.challenge || "—"}</div>
+                    </div>
+                  </div>
+
+                  {/* 3. PLAN INFORMATION */}
+                  <div style={{ background: "rgba(0,0,0,0.3)", padding: "18px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <h4 style={{ color: "#ffc107", fontSize: "12px", fontWeight: "900", letterSpacing: "1px", textTransform: "uppercase", marginBottom: "12px" }}>
+                      3. PLAN INFORMATION
+                    </h4>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px" }}>
+                      <div><strong style={{ color: "#8f9ca7" }}>Plan Name:</strong> {clientDetails.plan_info?.name || clientDetails.plan_name || "—"}</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Tier:</strong> {clientDetails.plan_info?.tier || "Standard"}</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Duration:</strong> {clientDetails.plan_info?.duration || "1 Bishii"}</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Price:</strong> {clientDetails.plan_info?.price ? `$${clientDetails.plan_info.price}` : "—"}</div>
+                    </div>
+                  </div>
+
+                  {/* 4. PAYMENT INFORMATION */}
+                  <div style={{ background: "rgba(0,0,0,0.3)", padding: "18px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <h4 style={{ color: "#00d9ff", fontSize: "12px", fontWeight: "900", letterSpacing: "1px", textTransform: "uppercase", marginBottom: "12px" }}>
+                      4. PAYMENT & SIFALO
+                    </h4>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px" }}>
+                      <div><strong style={{ color: "#8f9ca7" }}>Status:</strong> {clientDetails.payment_info?.payment_status || clientDetails.payment_status}</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Amount:</strong> {clientDetails.payment_info?.amount ? `${clientDetails.payment_info.amount} ${clientDetails.payment_info.currency}` : "—"}</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Provider:</strong> Sifalo Pay</div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Tx ID:</strong> <span style={{ fontFamily: "monospace", color: "#00d9ff" }}>{clientDetails.payment_info?.provider_transaction_id || "—"}</span></div>
+                      <div><strong style={{ color: "#8f9ca7" }}>Coaching:</strong> {clientDetails.payment_info?.coaching_status || (clientDetails.payment_status === "PAID" ? "ACTIVE" : "INACTIVE")}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* MODAL ACTIONS BAR */}
+                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: "10px", borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "18px" }}>
+                  <button
+                    onClick={() => handleLiveSifaloVerify(clientDetails.order_id || clientDetails.payment_info?.order_id)}
+                    disabled={verifyingOrderId === (clientDetails.order_id || clientDetails.payment_info?.order_id)}
+                    style={{
+                      background: "rgba(0, 217, 255, 0.15)",
+                      border: "1px solid #00d9ff",
+                      color: "#00d9ff",
+                      padding: "10px 18px",
+                      borderRadius: "8px",
+                      fontWeight: "700",
+                      fontSize: "13px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px"
+                    }}
+                  >
+                    <FaShieldAlt /> {verifyingOrderId === (clientDetails.order_id || clientDetails.payment_info?.order_id) ? "Checking Sifalo..." : "Live Verify with Sifalo Pay"}
+                  </button>
+
+                  {(clientDetails.payment_info?.payment_status || clientDetails.payment_status) !== "PAID" && (
+                    <button
+                      onClick={() => handleStatusChange(clientDetails.order_id || clientDetails.payment_info?.order_id, "PAID")}
+                      style={{
+                        background: "linear-gradient(135deg, #00d9ff, #00ffa6)",
+                        border: "none",
+                        color: "#0f172a",
+                        padding: "10px 18px",
+                        borderRadius: "8px",
+                        fontWeight: "800",
+                        fontSize: "13px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px"
+                      }}
+                    >
+                      <FaCheck /> Mark as PAID & Grant Access
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => setClientDetails(null)}
+                    style={{
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(255,255,255,0.15)",
+                      color: "#fff",
+                      padding: "10px 18px",
+                      borderRadius: "8px",
+                      fontWeight: "600",
+                      fontSize: "13px",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             )}
 
@@ -525,48 +685,68 @@ const Dashboard = () => {
                           <td style={{ padding: "14px 16px", fontSize: "12px", color: "#94a3b8" }}>
                             {p.created_at ? new Date(p.created_at).toLocaleDateString() : "—"}
                           </td>
-                          <td style={{ padding: "14px 16px" }}>
-                            {p.payment_status === "PAYMENT_REVIEW" && (
+                          <td style={{ padding: "14px 16px", whiteSpace: "nowrap" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              {/* LIVE SIFALO VERIFY BUTTON */}
                               <button
-                                onClick={() => handleStatusChange(p.order_id, "PAID")}
+                                onClick={() => handleLiveSifaloVerify(p.order_id)}
+                                disabled={verifyingOrderId === p.order_id}
                                 style={{
-                                  background: "#00ffa6",
-                                  color: "#0f172a",
-                                  border: "none",
+                                  background: "rgba(0, 217, 255, 0.1)",
+                                  border: "1px solid rgba(0, 217, 255, 0.3)",
+                                  color: "#00d9ff",
                                   borderRadius: "4px",
                                   padding: "4px 8px",
                                   fontSize: "11px",
-                                  fontWeight: "bold",
+                                  fontWeight: "700",
+                                  cursor: "pointer",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "4px"
+                                }}
+                                title="Check real-time status with Sifalo Pay Gateway API"
+                              >
+                                <FaShieldAlt size={10} /> {verifyingOrderId === p.order_id ? "..." : "Sifalo"}
+                              </button>
+
+                              {/* FULL PROFILE BUTTON */}
+                              <button
+                                onClick={() => handleOpenProfile(p.order_id)}
+                                style={{
+                                  background: "rgba(255,255,255,0.06)",
+                                  border: "1px solid rgba(255,255,255,0.15)",
+                                  color: "#fff",
+                                  borderRadius: "4px",
+                                  padding: "4px 8px",
+                                  fontSize: "11px",
+                                  fontWeight: "700",
                                   cursor: "pointer"
                                 }}
-                                title="Mark as PAID and grant access"
+                                title="Open full client questionnaire and payment profile"
                               >
-                                <FaCheck /> Approve
+                                Profile
                               </button>
-                            )}
-                            {p.access_code && (
-                              <button
-                                onClick={() => {
-                                  setCoachCodeInput(p.access_code);
-                                  getCoachClientByAccessCode(p.access_code).then((res) => {
-                                    if (res.success) setClientDetails(res.data);
-                                  });
-                                }}
-                                style={{
-                                  background: "rgba(0,217,255,0.1)",
-                                  border: "1px solid #00d9ff",
-                                  color: "#00d9ff",
-                                  borderRadius: "4px",
-                                  padding: "3px 8px",
-                                  fontSize: "11px",
-                                  cursor: "pointer",
-                                  marginLeft: "4px"
-                                }}
-                                title="View full questionnaire and details"
-                              >
-                                Details
-                              </button>
-                            )}
+
+                              {/* APPROVE BUTTON IF NOT PAID */}
+                              {p.payment_status !== "PAID" && (
+                                <button
+                                  onClick={() => handleStatusChange(p.order_id, "PAID")}
+                                  style={{
+                                    background: "#00ffa6",
+                                    color: "#0f172a",
+                                    border: "none",
+                                    borderRadius: "4px",
+                                    padding: "4px 8px",
+                                    fontSize: "11px",
+                                    fontWeight: "bold",
+                                    cursor: "pointer"
+                                  }}
+                                  title="Manually approve to PAID and grant access"
+                                >
+                                  <FaCheck size={10} /> Approve
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))

@@ -60,6 +60,32 @@ export async function updatePaymentStatus(orderId, status) {
   }
 }
 
+// Live Sifalo API status check by Admin
+export async function verifySifaloPayment(orderId) {
+  try {
+    const res = await axios.post(`${API_BASE}/admin/payments/${orderId}/verify-sifalo`);
+    return { success: true, data: res.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.error || "Failed to verify transaction with Sifalo Pay"
+    };
+  }
+}
+
+// Complete Client Profile Lookup (User info, Fitness info, Plan info, Payment info)
+export async function getFullClientProfile(orderId) {
+  try {
+    const res = await axios.get(`${API_BASE}/admin/payments/${orderId}/profile`);
+    return { success: true, data: res.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.error || "Profile not found"
+    };
+  }
+}
+
 // ── BLOG ARTICLES MANAGEMENT ──
 export async function getAdminArticles(params = {}) {
   try {

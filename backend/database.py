@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, scoped_session
 from .config import Config
-from .models import Base, Plan, AdminUser, Article, EmailSubscription
+from .models import Base, Plan, AdminUser, Article, EmailSubscription, NotificationLog
 import hashlib
 from datetime import datetime, timezone
 
@@ -98,64 +98,109 @@ def seed_defaults(db):
         db.commit()
         print("[DATABASE] Default admin user created (qorshahjidhka@gmail.com).")
 
-    # 3. Seed initial published fitness articles if empty
+    # 3. Seed initial Stitch published fitness articles if empty
     articles_count = db.query(Article).count()
     if articles_count == 0:
         sample_articles = [
             Article(
-                id="art-cunto-jimicsi-2026",
-                title="Sida Loo Qorsheeyo Cunto Caafimaad Leh Oo Jidhka Dhisaysa",
-                slug="sida-loo-qorsheeyo-cunto-caafimaad-leh",
-                excerpt="Baro sida loo kala saaro Protein-ka, Carbs-ka, iyo Fats-ka si aad u hesho natiijo degdeg ah oo joogto ah.",
-                content="""Dhismaha jidhku wuxuu 70% ku xidhan yahay cuntada aad cunto maalin kasta. Hadii aad jimicsi adag samayso adigoon cuntada hagaajin, natiijadaadu waxay noqonaysaa mid aad u gaabis ah.
+                id="art-hypertrophy-principles",
+                title="The 5 Fundamental Hypertrophy Principles Most Lifters Ignore",
+                slug="5-hypertrophy-principles-most-lifters-ignore",
+                excerpt="A rigorous breakdown of progressive tension overload, systematic proximity to failure (RIR), volume tiering, and recovery mechanics required for elite muscle adaptation.",
+                content="""Most intermediate trainees dramatically underestimate their true mechanical failure thresholds. When prescribed 2 Reps in Reserve (RIR), video analysis consistently confirms trainees are stopping 4 to 6 reps shy of true failure. Without targeted mechanical tension in the final voluntary contractions, high-threshold motor unit recruitment is negligible.
 
-### 1. Muhiimada Protein-ka
-Protein-ku waa dhisaha ugu weyn ee murqaha. Isku day inaad hesho ugu yaraan 1.6g ilaa 2.2g oo protein ah halkii kiiloogaraam oo miisaankaaga ah. Cuntooyinka qaniga ku ah protein-ka waxaa ka mid ah:
-- Hilibka digaagga iyo xoolaha
-- Ukunta (gaar ahaan jaallaha iyo cadaanka)
-- Kalluunka
-- Digirta iyo digir-caddaanka
+> "Hypertrophy isn't rewarded for effort spent in warm-up territory; it demands precision at the outer edge of structural fatigue."
 
-### 2. Carbohydrates iyo Tamar
-Ha ka cabsan carbohydrates-ka! Jirkaagu wuxuu u baahan yahay tamar uu ku jimicsado. Dooro complex carbs sida bariiska buniga ah, boorashka (oats), iyo baradhada macaan.
+### Key Physiological Rules:
+* Calibrate your 0-2 RIR gauge using occasional AMRAP sets on safe, guided movements.
+* Log rest periods as rigorously as load; metabolic clearance determines subsequent set motor unit recruitment.
+* Prioritize lengthen-biased exercises to maximize mechanical stretch under active load.
 
-### 3. Biyo Badan Cab
-Biyuhu waxay caawiyaan dheef-shiidka iyo soo kabashada murqaha. Cab ugu yaraan 3 ilaa 4 litir oo biyo ah maalin kasta.""",
+### Coach Protocol Checkpoint
+Prioritize 12-18 hard weekly working sets per muscle group across two distinct weekly exposures rather than catastrophic single-session volume dumping.
+
+### Principle 01: Lengthened Overload vs Contractile Velocity
+Mechanical tension generated at long muscle lengths elicits significantly higher hypertrophic signalling through titin kinase activation and focal adhesion kinase cascades compared to peak contraction squeezes.
+
+### Principle 02: Systematic Proximity to Failure (RIR Calibration)
+Stimulating reps occur primarily in the final 4-5 repetitions of a set taken within 0-2 RIR. Moving sets beyond this envelope without adequate recovery baseline generates disproportionate central nervous system fatigue.""",
                 featured_image="/images/hero-1.jpg",
+                category="Fitness",
+                categories=["Fitness", "Workouts"],
+                tags=["Hypertrophy", "Muscle Growth", "RIR", "Programming"],
+                author="Coach Naasir",
+                views=48210,
                 status="published",
                 published_at=datetime.now(timezone.utc)
             ),
             Article(
-                id="art-dhismaha-murqaha-degdeg",
-                title="5 Khalad Oo Ka Hortaga In Murqahaagu Koraan",
-                slug="5-khalad-oo-ka-hortaga-dhismaha-murqaha",
-                excerpt="Ogow khaladaadka ugu badan ee dadku galaan marka ay gym-ka galaan iyo sida looga fogaado.",
-                content="""Marka dad badani bilaabaan jimicsiga, waxay filayaan natiijooyin degdeg ah, laakiin khaladaad yaryar ayaa ka joojin kara guusha.
+                id="art-zone-2-endurance",
+                title="Zone 2 Endurance Protocols for Lifters",
+                slug="zone-2-endurance-for-lifters",
+                excerpt="How low-intensity mitochondrial conditioning enhances intra-set ATP recovery without blunting hypertrophic mTOR pathways.",
+                content="""Low-intensity steady-state cardiovascular conditioning stimulates mitochondrial biogenesis in type I fibers and enhances systemic lactate clearance kinetics, directly improving recovery between high-intensity lifting sets.
 
-### Khaladka 1: Hurdo La'aan iyo Nasasho La'aan
-Murquhu ma koraan markaad gym-ka ku jirto — waxay koraan markaad huruddo oo aad nasanayso. U hurud 7-8 saacadood habeen kasta.
-
-### Khaladka 2: Miisaan Culus oo Foom Xun (Ego Lifting)
-Jimicsi ku samee qaab sax ah (proper form) intii aad qaadi lahayd culeys aadan xakameyn karin oo dhaawac kugu keeni kara.
-
-### Khaladka 3: Joogteyn La'aan (Inconsistency)
-Jimicsiga ugu fiican waa midka aad joogtaysid. 3-4 maalmood oo toddobaad kasta ah ayaa ku filan haddii aad si joogto ah u waddo.""",
+### Mitochondria & Hypertrophy
+Aerobic capacity determines how quickly phosphocreatine resynthesizes between heavy working sets. Trainees with poor aerobic baselines compromise total volume output.""",
                 featured_image="/images/hero-3.jpg",
+                category="Workouts",
+                categories=["Workouts", "Fitness"],
+                tags=["Cardio", "Zone 2", "Conditioning"],
+                author="Coach Naasir",
+                views=3892,
                 status="published",
                 published_at=datetime.now(timezone.utc)
+            ),
+            Article(
+                id="art-protein-synthesis-threshold",
+                title="Protein Synthesis Threshold & Leucine Trigger Guide",
+                slug="protein-synthesis-threshold-guide",
+                excerpt="Demystifying optimal daily protein distribution, essential amino acid thresholds, and peri-workout nutrient timing.",
+                content="""Muscle protein synthesis (MPS) requires a minimum intracellular leucine concentration to trigger the mTORC1 signaling pathway.
+
+### The Leucine Trigger
+Consuming 3g of leucine per meal ensures complete saturation of the MPS cascade. Space your protein intakes across 4-5 meals throughout the day for optimal 24-hour nitrogen balance.""",
+                featured_image="/images/img-3.jpg",
+                category="Nutrition",
+                categories=["Nutrition"],
+                tags=["Protein", "Nutrition", "Diet"],
+                author="Elena Vance",
+                views=5140,
+                status="published",
+                published_at=datetime.now(timezone.utc)
+            ),
+            Article(
+                id="art-intra-workout-carbs",
+                title="Intra-Workout Carbohydrate Ratios for Elite Output",
+                slug="intra-workout-carbohydrate-ratios",
+                excerpt="Cluster dextrin vs maltodextrin protocols for maintaining blood glucose and delaying central fatigue during 90+ minute lifting sessions.",
+                content="""Sustained high-volume resistance training depletes muscular glycogen. Targeted intra-workout carbohydrate ingestion prevents cortisol spikes and maintains maximal force output.""",
+                featured_image="/images/img-4.jpg",
+                category="Workouts",
+                categories=["Workouts", "Nutrition"],
+                tags=["Carbs", "Fuel", "Intra-Workout"],
+                author="Coach Naasir",
+                views=1420,
+                status="draft",
+                published_at=None
             )
         ]
         for a in sample_articles:
             db.add(a)
         db.commit()
-        print("[DATABASE] Sample blog articles seeded successfully.")
+        print("[DATABASE] Sample Stitch blog articles seeded successfully.")
 
 def run_migrations(db):
     # Ensure missing columns in existing SQLite or Postgres tables are safely added
     migrations = [
         "ALTER TABLE questionnaires ADD COLUMN email VARCHAR(255);",
         "ALTER TABLE payments ADD COLUMN customer_email VARCHAR(255);",
-        "ALTER TABLE plans ADD COLUMN active BOOLEAN DEFAULT 1;"
+        "ALTER TABLE plans ADD COLUMN active BOOLEAN DEFAULT 1;",
+        "ALTER TABLE articles ADD COLUMN category VARCHAR(100) DEFAULT 'Fitness';",
+        "ALTER TABLE articles ADD COLUMN categories JSON;",
+        "ALTER TABLE articles ADD COLUMN tags JSON;",
+        "ALTER TABLE articles ADD COLUMN author VARCHAR(100) DEFAULT 'Coach Naasir';",
+        "ALTER TABLE articles ADD COLUMN views NUMERIC(10, 0) DEFAULT 0;"
     ]
     for sql in migrations:
         try:
@@ -172,3 +217,4 @@ def init_db():
         seed_defaults(db)
     finally:
         db.close()
+

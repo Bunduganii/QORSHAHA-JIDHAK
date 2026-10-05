@@ -189,12 +189,18 @@ class Article(Base):
     excerpt = Column(Text, nullable=True)
     content = Column(Text, nullable=False)
     featured_image = Column(String(512), nullable=True)
+    category = Column(String(100), default="Fitness", nullable=False)
+    categories = Column(JSON, default=list)
+    tags = Column(JSON, default=list)
+    author = Column(String(100), default="Coach Naasir", nullable=False)
+    views = Column(Numeric(10, 0), default=0)
     status = Column(String(30), default="draft", nullable=False, index=True)  # 'draft' or 'published'
     published_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True)
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     def to_dict(self):
+        cats = self.categories or ([self.category] if self.category else ["Fitness"])
         return {
             "id": self.id,
             "title": self.title,
@@ -202,6 +208,11 @@ class Article(Base):
             "excerpt": self.excerpt,
             "content": self.content,
             "featured_image": self.featured_image,
+            "category": self.category or "Fitness",
+            "categories": cats,
+            "tags": self.tags or [],
+            "author": self.author or "Coach Naasir",
+            "views": int(self.views) if self.views is not None else 0,
             "status": self.status,
             "published_at": self.published_at.isoformat() if self.published_at else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
@@ -226,6 +237,35 @@ class EmailSubscription(Base):
             "unsubscribed_at": self.unsubscribed_at.isoformat() if self.unsubscribed_at else None
         }
 
+class NotificationLog(Base):
+    __tablename__ = "notification_logs"
+    
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    article_id = Column(String(64), ForeignKey("articles.id"), nullable=True, index=True)
+    subscriber_id = Column(String(64), ForeignKey("email_subscriptions.id"), nullable=True, index=True)
+    recipient_email = Column(String(255), nullable=False, index=True)
+    provider = Column(String(50), default="BREVO")  # 'BREVO' or 'SMTP'
+    status = Column(String(30), default="pending", nullable=False, index=True)  # 'pending', 'sent', 'failed'
+    sent_at = Column(DateTime(timezone=True), nullable=True)
+    error = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True)
+
+    article = relationship("Article", backref="notification_logs")
+    subscriber = relationship("EmailSubscription", backref="notification_logs")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "article_id": self.article_id,
+            "subscriber_id": self.subscriber_id,
+            "recipient_email": self.recipient_email,
+            "provider": self.provider,
+            "status": self.status,
+            "sent_at": self.sent_at.isoformat() if self.sent_at else None,
+            "error": self.error,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+
 class AdminUser(Base):
     __tablename__ = "admin_users"
     
@@ -235,3 +275,13 @@ class AdminUser(Base):
     full_name = Column(String(255), default="Coach Naasir")
     role = Column(String(50), default="admin")
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "full_name": self.full_name,
+            "role": self.role,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+

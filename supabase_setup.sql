@@ -91,11 +91,21 @@ CREATE TABLE IF NOT EXISTS public.articles (
     excerpt TEXT,
     content TEXT NOT NULL,
     featured_image VARCHAR(512),
+    category VARCHAR(100) DEFAULT 'Fitness',
+    categories JSONB DEFAULT '["Fitness"]'::jsonb,
+    tags JSONB DEFAULT '[]'::jsonb,
+    author VARCHAR(100) DEFAULT 'Coach Naasir',
+    views NUMERIC(10, 0) DEFAULT 0,
     status VARCHAR(30) DEFAULT 'draft' NOT NULL,
     published_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE public.articles ADD COLUMN IF NOT EXISTS category VARCHAR(100) DEFAULT 'Fitness';
+ALTER TABLE public.articles ADD COLUMN IF NOT EXISTS categories JSONB DEFAULT '["Fitness"]'::jsonb;
+ALTER TABLE public.articles ADD COLUMN IF NOT EXISTS tags JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE public.articles ADD COLUMN IF NOT EXISTS author VARCHAR(100) DEFAULT 'Coach Naasir';
+ALTER TABLE public.articles ADD COLUMN IF NOT EXISTS views NUMERIC(10, 0) DEFAULT 0;
 
 -- 7. EMAIL SUBSCRIPTIONS TABLE
 CREATE TABLE IF NOT EXISTS public.email_subscriptions (
@@ -106,7 +116,20 @@ CREATE TABLE IF NOT EXISTS public.email_subscriptions (
     unsubscribed_at TIMESTAMP WITH TIME ZONE
 );
 
--- 8. ADMIN USERS TABLE
+-- 8. NOTIFICATION LOGS (BREVO / SMTP) TABLE
+CREATE TABLE IF NOT EXISTS public.notification_logs (
+    id VARCHAR(64) PRIMARY KEY,
+    article_id VARCHAR(64) REFERENCES public.articles(id) ON DELETE CASCADE,
+    subscriber_id VARCHAR(64) REFERENCES public.email_subscriptions(id) ON DELETE SET NULL,
+    recipient_email VARCHAR(255) NOT NULL,
+    provider VARCHAR(50) DEFAULT 'BREVO',
+    status VARCHAR(30) DEFAULT 'pending' NOT NULL,
+    sent_at TIMESTAMP WITH TIME ZONE,
+    error TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 9. ADMIN USERS TABLE
 CREATE TABLE IF NOT EXISTS public.admin_users (
     id VARCHAR(64) PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,

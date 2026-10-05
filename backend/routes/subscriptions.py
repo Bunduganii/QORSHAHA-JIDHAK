@@ -46,9 +46,16 @@ def subscribe():
         db.add(new_sub)
         db.commit()
 
+        # Send welcome confirmation email
+        try:
+            from ..services.email_service import EmailService
+            EmailService.send_welcome_email(email)
+        except Exception as welcome_err:
+            print(f"[WELCOME EMAIL] Notice: {welcome_err}")
+
         return jsonify({
             "success": True,
-            "message": "Waad ku guuleysatay diiwaangelinta newsletter-ka! 🎉"
+            "message": "Waad ku guuleysatay diiwaangelinta newsletter-ka! 🎉 Eeg email-kaaga."
         }), 201
     except Exception as e:
         db.rollback()

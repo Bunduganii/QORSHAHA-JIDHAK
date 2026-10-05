@@ -259,3 +259,134 @@ def get_all_collected_emails():
         }), 200
     finally:
         db.close()
+
+@admin_bp.route("/payments/<order_id>/verify-sifalo", methods=["POST"])
+def admin_verify_sifalo(order_id):
+    """
+    Live Sifalo Pay transaction status check initiated by Coach/Admin.
+    Queries the official Sifalo API directly and synchronizes PostgreSQL.
+    """
+    from ..services.sifalo_service import SifaloService
+
+    db = SessionLocal()
+    try:
+        payment = db.query(Payment).filter_by(order_id=order_id).first()
+        if not payment:
+            return jsonify({"error": "Payment not found"}), 404
+
+        clean_account = payment.payment_phone or payment.whatsapp_phone
+        amount_to_send = str(int(payment.amount)) if payment.currency in ["SLSH", "SOS"] else f"{float(payment.amount):.2f}".rstrip('0').rstrip('.')
+
+        sifalo_res = SifaloService.check_payment_status(
+            order_id=payment.order_id,
+            sid=payment.provider_transaction_id,
+            account=clean_account,
+            gateway=payment.payment_method,
+            amount=amount_to_send,
+            currency=payment.currency
+        )
+
+        status = sifalo_res.get("status")
+        if sifalo_res.get("sid"):
+            payment.provider_transaction_id = sifalo_res.get("sid")
+        if sifalo_res.get("raw"):
+            payment.raw_response = sifalo_res.get("raw")
+
+        if status == "PAID":
+            payment.payment_status = "PAID"
+            payment.paid_at = datetime.now(timezone.utc)
+            db.commit()
+            plan_name = payment.plan.name if payment.plan else "Fitness Plan"
+            access = grant_coaching_access(db, payment, payment.questionnaire, plan_name, payment.plan_id)
+            return jsonify({
+                "success": True,
+                "verified": True,
+                "payment_status": "PAID",
+                "message": "Payment verified as PAID by Sifalo Pay! Coaching access granted.",
+                "access_code": access.access_code,
+                "raw": sifalo_res.get("raw")
+            }), 200
+        elif status == "FAILED":
+            payment.payment_status = "FAILED"
+            db.commit()
+            return jsonify({
+                "success": True,
+                "verified": True,
+                "payment_status": "FAILED",
+                "message": "Sifalo reports payment FAILED or CANCELLED.",
+                "raw": sifalo_res.get("raw")
+            }), 200
+        else:
+            return jsonify({
+                "success": True,
+                "verified": False,
+                "payment_status": payment.payment_status,
+                "message": sifalo_res.get("message", "Payment is still PENDING in Sifalo Pay."),
+                "raw": sifalo_res.get("raw")
+            }), 200
+    except Exception as e:
+        db.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db.close()
+
+@admin_bp.route("/payments/<order_id>/profile", methods=["GET"])
+def get_full_client_profile(order_id):
+    """
+    Returns the comprehensive profile for Coach inspection:
+    User Info, Fitness Info (questionnaire answers), Plan Info, Payment Info, Sifalo Reference.
+    """
+    db = SessionLocal()
+    try:
+        payment = db.query(Payment).filter_by(order_id=order_id).first()
+        if not payment:
+            return jsonify({"error": "Payment record not found"}), 404
+
+        q = payment.questionnaire
+        plan = payment.plan
+        access = payment.coaching_access
+
+        profile = {
+            "order_id": payment.order_id,
+            "user_info": {
+                "name": payment.customer_name,
+                "whatsapp": payment.whatsapp_phone,
+                "email": payment.customer_email or (q.email if q else None),
+                "payment_phone": payment.payment_phone
+            },
+            "fitness_info": {
+                "goal": q.goal if q else "—",
+                "gender": q.gender if q else "—",
+                "weight": f"{q.weight} {q.unit}" if q and q.weight else "—",
+                "height": f"{q.height} {q.height_unit}" if q and q.height else "—",
+                "challenge": q.challenge if q else "—",
+                "birth_date": q.birth_date if q else "—",
+                "created_at": q.created_at.isoformat() if q and q.created_at else None
+            },
+            "plan_info": {
+                "id": plan.id if plan else None,
+                "name": plan.name if plan else "Fitness Plan",
+                "tier": plan.tier if plan else "Standard",
+                "duration": plan.duration if plan else "1 Bishii",
+                "price": float(plan.price) if plan and plan.price is not None else float(payment.amount),
+                "price_cash": float(plan.price_cash) if plan and plan.price_cash is not None else None,
+                "currency": payment.currency
+            },
+            "payment_info": {
+                "amount": float(payment.amount),
+                "currency": payment.currency,
+                "payment_method": payment.payment_method,
+                "payment_status": payment.payment_status,
+                "provider": payment.provider,
+                "provider_transaction_id": payment.provider_transaction_id,
+                "provider_reference": payment.provider_reference,
+                "created_at": payment.created_at.isoformat() if payment.created_at else None,
+                "paid_at": payment.paid_at.isoformat() if payment.paid_at else None,
+                "access_code": access.access_code if access else None,
+                "coaching_status": access.status if access else "INACTIVE"
+            }
+        }
+        return jsonify(profile), 200
+    finally:
+        db.close()
+

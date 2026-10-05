@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime, timezone
 from flask import Blueprint, jsonify, request
 from ..database import SessionLocal
-from ..models import Article, EmailSubscription
+from ..models import Article, EmailSubscription, NotificationLog
 from ..services.email_service import EmailService
 
 articles_bp = Blueprint("articles", __name__, url_prefix="/api/articles")
@@ -18,6 +18,7 @@ def slugify(text: str) -> str:
 @articles_bp.route("", methods=["GET"])
 def get_articles():
     status = request.args.get("status")
+    category = request.args.get("category")
     search = request.args.get("q", "").strip().lower()
 
     db = SessionLocal()
@@ -27,11 +28,23 @@ def get_articles():
         # If public request without status=all, only show published articles
         if status != "all":
             query = query.filter(Article.status == "published")
+        elif status == "draft":
+            query = query.filter(Article.status == "draft")
+        elif status == "published":
+            query = query.filter(Article.status == "published")
         
+        if category and category.lower() != "dhamaan" and category.lower() != "all":
+            query = query.filter(
+                (Article.category.ilike(f"%{category}%")) |
+                (Article.content.ilike(f"%{category}%"))
+            )
+
         if search:
             query = query.filter(
                 (Article.title.ilike(f"%{search}%")) |
-                (Article.excerpt.ilike(f"%{search}%"))
+                (Article.excerpt.ilike(f"%{search}%")) |
+                (Article.content.ilike(f"%{search}%")) |
+                (Article.slug.ilike(f"%{search}%"))
             )
 
         articles = query.order_by(Article.created_at.desc()).all()
@@ -49,6 +62,14 @@ def get_article(slug_or_id):
 
         if not article:
             return jsonify({"error": "Article not found"}), 404
+
+        # Increment read count
+        try:
+            article.views = (article.views or 0) + 1
+            db.commit()
+            db.refresh(article)
+        except Exception:
+            db.rollback()
 
         return jsonify(article.to_dict()), 200
     finally:
@@ -82,6 +103,10 @@ def create_article():
         status = "draft"
 
     featured_image = data.get("featured_image") or "/images/hero-1.jpg"
+    category = data.get("category") or "Fitness"
+    categories = data.get("categories") or [category]
+    tags = data.get("tags") or []
+    author = data.get("author") or "Coach Naasir"
 
     db = SessionLocal()
     try:
@@ -98,6 +123,11 @@ def create_article():
             excerpt=excerpt,
             content=content,
             featured_image=featured_image,
+            category=category,
+            categories=categories,
+            tags=tags,
+            author=author,
+            views=0,
             status=status,
             published_at=now if status == "published" else None
         )
@@ -105,13 +135,14 @@ def create_article():
         db.commit()
         db.refresh(article)
 
-        # If published immediately, notify active subscribers
+        # If published immediately, notify active subscribers and log to notification_logs
         notification_res = None
-        if status == "published":
+        should_broadcast = data.get("broadcast", True)
+        if status == "published" and should_broadcast:
             subscribers = db.query(EmailSubscription).filter_by(status="subscribed").all()
             if subscribers:
                 sub_list = [s.to_dict() for s in subscribers]
-                notification_res = EmailService.notify_subscribers_about_article(sub_list, article.to_dict())
+                notification_res = EmailService.notify_subscribers_about_article(sub_list, article.to_dict(), db=db)
 
         res_data = article.to_dict()
         if notification_res:
@@ -149,6 +180,14 @@ def update_article(article_id):
             article.content = data["content"].strip()
         if "featured_image" in data:
             article.featured_image = data["featured_image"]
+        if "category" in data:
+            article.category = data["category"]
+        if "categories" in data:
+            article.categories = data["categories"]
+        if "tags" in data:
+            article.tags = data["tags"]
+        if "author" in data:
+            article.author = data["author"]
         if "status" in data:
             new_status = data["status"].lower()
             if new_status in ["draft", "published"]:
@@ -161,11 +200,12 @@ def update_article(article_id):
 
         # Notify subscribers if transitioned from draft to published
         notification_res = None
-        if was_draft and article.status == "published":
+        should_broadcast = data.get("broadcast", True)
+        if was_draft and article.status == "published" and should_broadcast:
             subscribers = db.query(EmailSubscription).filter_by(status="subscribed").all()
             if subscribers:
                 sub_list = [s.to_dict() for s in subscribers]
-                notification_res = EmailService.notify_subscribers_about_article(sub_list, article.to_dict())
+                notification_res = EmailService.notify_subscribers_about_article(sub_list, article.to_dict(), db=db)
 
         res_data = article.to_dict()
         if notification_res:
@@ -192,5 +232,19 @@ def delete_article(article_id):
     except Exception as e:
         db.rollback()
         return jsonify({"error": str(e)}), 500
+    finally:
+        db.close()
+
+@articles_bp.route("/notifications", methods=["GET"])
+def get_article_notifications():
+    """Returns notification logs from PostgreSQL for admin inspection."""
+    article_id = request.args.get("article_id")
+    db = SessionLocal()
+    try:
+        query = db.query(NotificationLog)
+        if article_id:
+            query = query.filter_by(article_id=article_id)
+        logs = query.order_by(NotificationLog.created_at.desc()).limit(100).all()
+        return jsonify([log.to_dict() for log in logs]), 200
     finally:
         db.close()

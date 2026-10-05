@@ -36,7 +36,7 @@ const App = () => {
           <Route path='/Loading' element={<Loading />} />
           <Route path='/success' element={<Success />} />
           <Route path='/admin' element={<AdminLogin />} />
-          <Route path='/admin-dashboard' element={<AdminDashboard />} />
+          <Route path='/admin-dashboard' element={<AdminDashboard />} /> 
         </Routes>
       </div>
     </>

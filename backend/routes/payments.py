@@ -56,6 +56,23 @@ def grant_coaching_access(db, payment, questionnaire, plan_name, plan_id=None):
     except Exception as s_err:
         print(f"[SUPABASE] Payment insert notice: {s_err}")
 
+    # Send payment confirmation email to customer
+    try:
+        from ..services.email_service import EmailService
+        customer_email = payment.customer_email or (questionnaire.email if questionnaire else None)
+        if customer_email and "@" in str(customer_email):
+            EmailService.send_payment_confirmation(
+                to_email=customer_email,
+                customer_name=payment.customer_name,
+                plan_name=plan_name,
+                access_code=access.access_code,
+                amount=float(payment.amount),
+                currency=payment.currency,
+                coach_whatsapp=Config.COACH_WHATSAPP
+            )
+    except Exception as em_err:
+        print(f"[EMAIL] Payment confirmation notice: {em_err}")
+
     return access
 
 @payments_bp.route("/create", methods=["POST"])

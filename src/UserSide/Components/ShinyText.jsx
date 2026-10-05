@@ -3,6 +3,7 @@ import { motion, useMotionValue, useAnimationFrame, useTransform } from 'motion/
 import '../Components/Pages/page.css';
 
 const ShinyText = ({
+  children,
   text,
   disabled = false,
   speed = 2,
@@ -103,14 +104,14 @@ const ShinyText = ({
   };
 
   return (
-    <motion.span
-      className={`shiny-text ${className}`}
-      style={{ ...gradientStyle, backgroundPosition }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {text}
-    </motion.span>
+   <motion.span
+  className={`shiny-text ${className}`}
+  style={{ ...gradientStyle, backgroundPosition }}
+  onMouseEnter={handleMouseEnter}
+  onMouseLeave={handleMouseLeave}
+>
+  {children || text}
+</motion.span>
   );
 };
 

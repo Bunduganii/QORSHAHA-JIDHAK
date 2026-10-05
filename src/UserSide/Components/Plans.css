@@ -1,0 +1,178 @@
+/* ===========================
+   PLANS PAGE — PREMIUM DESIGN
+   =========================== */
+
+.plan-tier-pill {
+  display: inline-block;
+  background: rgba(0, 217, 255, 0.12);
+  color: #00d9ff;
+  border: 1px solid rgba(0, 217, 255, 0.35);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 5px 14px;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.plan-name {
+  font-size: 1.8rem;
+  font-weight: 900;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+/* PRICE BLOCK */
+.plan-price-block {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.price-currency {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #00d9ff;
+  line-height: 1;
+}
+
+.price-amount {
+  font-size: 4.5rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+}
+
+.price-period {
+  font-size: 13px;
+  opacity: 0.6;
+  margin-left: 4px;
+}
+
+/* Cash badge shown alongside dollar */
+.price-cash-badge {
+  width: 100%;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #00ffa6;
+  background: rgba(0, 255, 166, 0.08);
+  border: 1px solid rgba(0, 255, 166, 0.25);
+  border-radius: 999px;
+  padding: 3px 12px;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+/* DURATION */
+.plan-duration {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 14px;
+  letter-spacing: 0.5px;
+}
+
+/* DESCRIPTION */
+.plan-desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+/* DIVIDER */
+.plan-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 22px 0;
+}
+
+/* FEATURES */
+.plan-features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.plan-feature-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.5;
+}
+
+.plan-check-icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 217, 255, 0.15);
+  border: 1px solid rgba(0, 217, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00d9ff;
+  margin-top: 1px;
+}
+
+/* CTA BUTTON — premium with real icons */
+.plan-cta-btn {
+  width: 100%;
+  margin-top: 28px;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #00d9ff 0%, #0094cc 100%);
+  color: #000;
+  font-weight: 900;
+  font-size: 15px;
+  cursor: pointer;
+  /* smooth lift only — no bounce */
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 20px rgba(0, 217, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.plan-cta-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(0, 217, 255, 0.45);
+  background: linear-gradient(135deg, #1ae6ff 0%, #00aaee 100%);
+}
+
+.plan-cta-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 217, 255, 0.3);
+}
+
+/* POPULAR PLAN OVERRIDE */
+.active-plan .plan-name,
+.active-plan .price-amount {
+  color: #fff;
+}
+
+.active-plan .plan-tier-pill {
+  background: rgba(0, 217, 255, 0.2);
+}
+
+/* TOP BADGE */
+.top-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #000;
+  background: linear-gradient(135deg, #00d9ff, #0094cc);
+  padding: 4px 14px;
+  border-radius: 999px;
+}

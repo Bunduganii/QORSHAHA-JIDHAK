@@ -40,9 +40,10 @@ const Navbar = () => {
   <div className='center-links'>
 <ul className='nav-links'>
   <li><a href="/" onClick={CloseMenu}>Home</a></li>
-  <li><a href="Coaching">Coaching</a></li>
-  <li><a href="Social">Socials</a></li>
-  <li><a href="About"  onClick={CloseMenu}>About</a></li>
+  <li><a href="/Coaching">Coaching</a></li>
+  <li><a href="/blog" onClick={CloseMenu}>Blog</a></li>
+  <li><a href="/Social">Socials</a></li>
+  <li><a href="/About" onClick={CloseMenu}>About</a></li>
 </ul>
   </div>
   {/* Right-side */}
@@ -58,9 +59,10 @@ const Navbar = () => {
         <FaTimes className='close-icon' onClick={CloseMenu}/>
         <ul className="mobile-links">
           <li><a href="/">Home</a></li>
-          <li><a href="Coaching">Coaching</a></li>
-          <li><a href="Social">Socials</a></li>
-          <li><a href="About">About</a></li>
+          <li><a href="/Coaching">Coaching</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/Social">Socials</a></li>
+          <li><a href="/About">About</a></li>
         </ul>
 
         <button className="mobile-btn" onClick={()=>{navigate('/Questions')}}>Nagu Biir</button>

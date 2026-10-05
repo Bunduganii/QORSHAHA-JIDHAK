@@ -1,0 +1,495 @@
+/* ===========================
+   Upload Plan Modal
+=========================== */
+
+.upload-overlay {
+  position: fixed;
+  overflow-y: auto;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  animation: fadeIn .3s ease;
+}
+/* ===========================
+   Plan Features
+=========================== */
+
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.features-grid input {
+  background: #13272d;
+  border: 1px solid #294148;
+  color: white;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: .95rem;
+  transition: .3s;
+}
+
+.features-grid input:focus {
+  outline: none;
+  border-color: #00d0ff;
+  box-shadow: 0 0 0 4px rgba(0,208,255,.15);
+}
+
+.features-grid input::placeholder {
+  color: #6f8a92;
+}
+
+@media (max-width:768px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* fatures upload end style  */
+.upload-modal {
+  width: 900px;
+  max-width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(21, 42, 47, 0.92);
+  border: 1px solid rgba(0, 208, 255, .15);
+  border-radius: 22px;
+  backdrop-filter: blur(18px);
+  padding: 35px;
+  box-shadow:
+      0 20px 70px rgba(0,0,0,.45),
+      0 0 30px rgba(0,208,255,.08);
+  animation: popup .35s ease;
+}
+
+/* ===========================
+   Header
+=========================== */
+
+.upload-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:35px;
+}
+
+.upload-header h2{
+    color:#fff;
+    font-size:2rem;
+    margin:0;
+    font-weight:800;
+    letter-spacing:.5px;
+}
+
+.upload-header p{
+    color:#8ea5ad;
+    margin-top:8px;
+    font-size:.95rem;
+}
+
+.close-btn{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:20px;
+    color:#fff;
+    background:#22363b;
+    transition:.25s;
+}
+
+.close-btn:hover{
+    background:#00d0ff;
+    color:#081113;
+    transform:rotate(90deg);
+}
+
+/* ===========================
+   Form Grid
+=========================== */
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+}
+
+.input-group{
+    display:flex;
+    flex-direction:column;
+}
+
+.full-width{
+    margin-top:25px;
+}
+
+.input-group label{
+    color:#cfe6ec;
+    font-size:.9rem;
+    margin-bottom:8px;
+    font-weight:600;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea{
+
+    background:#13272d;
+    border:1px solid #294148;
+    color:#fff;
+
+    padding:14px 18px;
+
+    border-radius:14px;
+
+    font-size:.95rem;
+
+    outline:none;
+
+    transition:.3s;
+}
+
+.input-group textarea{
+    resize:none;
+}
+
+.input-group input:focus,
+.input-group textarea:focus,
+.input-group select:focus{
+
+    border-color:#00d0ff;
+
+    box-shadow:0 0 0 4px rgba(0,208,255,.15);
+}
+
+.input-group input::placeholder,
+textarea::placeholder{
+    color:#6f8a92;
+}
+
+/* ===========================
+   Upload Image
+=========================== */
+
+.upload-image-box{
+
+    margin-top:28px;
+}
+
+.upload-label{
+
+    width:100%;
+
+    min-height:240px;
+
+    border:2px dashed rgba(0,208,255,.25);
+
+    border-radius:20px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    overflow:hidden;
+
+    background:#112126;
+}
+
+.upload-label:hover{
+
+    border-color:#00d0ff;
+
+    background:#163138;
+}
+
+.upload-icon{
+
+    width:80px;
+
+    height:80px;
+
+    border-radius:50%;
+
+    background:rgba(0,208,255,.12);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:35px;
+
+    color:#00d0ff;
+
+    margin-bottom:18px;
+}
+
+.upload-label h3{
+
+    color:white;
+
+    margin-bottom:8px;
+
+    font-size:1.1rem;
+}
+
+.upload-label p{
+
+    color:#90a7af;
+
+    font-size:.9rem;
+}
+
+.preview-image{
+
+    width:100%;
+
+    height:240px;
+
+    object-fit:cover;
+}
+
+/* ===========================
+   Switch
+=========================== */
+
+.status-row{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    margin-top:30px;
+
+    color:white;
+
+    font-weight:600;
+}
+
+.switch{
+
+    position:relative;
+
+    display:inline-block;
+
+    width:58px;
+
+    height:30px;
+}
+
+.switch input{
+
+    display:none;
+}
+
+.slider{
+
+    position:absolute;
+
+    inset:0;
+
+    background:#555;
+
+    border-radius:30px;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.slider::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:24px;
+
+    height:24px;
+
+    left:3px;
+
+    top:3px;
+
+    background:white;
+
+    border-radius:50%;
+
+    transition:.3s;
+}
+
+.switch input:checked + .slider{
+
+    background:#00d0ff;
+}
+
+.switch input:checked + .slider::before{
+
+    transform:translateX(28px);
+}
+
+/* ===========================
+   Buttons
+=========================== */
+
+.button-group{
+
+    margin-top:35px;
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:15px;
+}
+
+.cancel-btn{
+
+    padding:13px 28px;
+
+    border:none;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    background:#2b3d42;
+
+    color:#fff;
+
+    font-weight:700;
+
+    transition:.3s;
+}
+
+.cancel-btn:hover{
+
+    background:#42585d;
+}
+
+.save-btn{
+
+    padding:13px 30px;
+
+    border:none;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    background:#00d0ff;
+
+    color:#061216;
+
+    font-weight:800;
+
+    transition:.3s;
+
+    box-shadow:0 0 18px rgba(0,208,255,.35);
+}
+
+.save-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 0 28px rgba(0,208,255,.55);
+}
+
+/* ===========================
+   Animations
+=========================== */
+
+@keyframes popup{
+
+    from{
+
+        transform:translateY(40px) scale(.95);
+
+        opacity:0;
+    }
+
+    to{
+
+        transform:translateY(0) scale(1);
+
+        opacity:1;
+    }
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+    }
+
+    to{
+
+        opacity:1;
+    }
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media(max-width:768px){
+
+.upload-modal{
+
+    padding:22px;
+}
+
+.form-grid{
+
+    grid-template-columns:1fr;
+}
+
+.upload-header{
+
+    flex-direction:column;
+
+    gap:20px;
+}
+
+.button-group{
+
+    flex-direction:column;
+}
+
+.save-btn,
+.cancel-btn{
+
+    width:100%;
+}
+
+.preview-image{
+
+    height:200px;
+}
+
+.upload-label{
+
+    min-height:200px;
+}
+
+}

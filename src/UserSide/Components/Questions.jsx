@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Pages/questions.css";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useEffect } from "react";
+import axios from "axios";
+import { supabase } from "../../Supabase";
 
-
-
-  // Story data
-  const stories = {
+  // Story data — gender-aware
+  const maleStories = {
     "Misaan-kordhin": {
       image: "/images/khalid-slide.jpeg",
       name: "Khaalid",
@@ -26,18 +25,57 @@ import { useEffect } from "react";
     }
   };
 
+  const femaleStories = {
+    "Misaan-kordhin": {
+      image: "/images/female-story-2.png",
+      name: "Fadumo",
+      result: "Waxaan dhimiyey 15kg 3 bilood gudahood"
+    },
+    "Muruq-dhissid": {
+      image: "/images/female-story-1.jpeg",
+      name: "Sahra",
+      result: "Jidhkeyga si buuxda ayuu isu beddelay 90 maalmood"
+    },
+    "Jidh-Hagaajin": {
+      image: "/images/female-story-2.png",
+      name: "Hodan",
+      result: "Waxaan heshay jidhka aan rabay 60 maalmood gudahood"
+    }
+  };
+
 export default function Questions() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
 
   const [goal, setGoal] = useState("");
   const [gender, setGender] = useState("");
   const [name, setName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [unit, setUnit] = useState("kg");
-const [weight, setWeight] = useState(75);
-const [challenge, setChallenge] = useState("");
-const [height, setHeight] = useState(178);
-const [birthDate, setBirthDate] = useState("");
+  const [weight, setWeight] = useState(75);
+  const [challenge, setChallenge] = useState("");
+  const [height, setHeight] = useState(178);
+  const [heightUnit, setHeightUnit] = useState("cm");
+  const [birthDate, setBirthDate] = useState("");
+
+  // Check Supabase Google auth session on mount
+  useEffect(() => {
+    const checkGoogleAuth = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user && user.email) {
+          setEmail(user.email);
+          if (user.user_metadata?.full_name && !name) {
+            setName(user.user_metadata.full_name);
+          }
+        }
+      } catch (e) {}
+    };
+    checkGoogleAuth();
+  }, []);
+
 // SAVES QUESTIONS INTO LOCAL HOST
 useEffect(()=>{
   const SavedData = localStorage.getItem("Qorshah-jidhka-user")
@@ -48,12 +86,17 @@ useEffect(()=>{
       setGender(data.gender || "")
       setName(data.name || "")
       setWhatsapp(data.whatsapp || "")
+      setEmail(data.email || "")
       setUnit(data.unit || "kg")
       setWeight(data.weight || 75)
       setChallenge(data.challenge || "")
+      setHeight(data.height || 178)
+      setHeightUnit(data.heightUnit || "cm")
     }
 },[])
-  const selectedStory = stories[goal] || null;
+  const storyBook = gender === "Female" ? femaleStories : maleStories;
+  const selectedStory = storyBook[goal] || null;
+
 useEffect(() => {
   const formData = {
     step,
@@ -61,9 +104,12 @@ useEffect(() => {
     gender,
     name,
     whatsapp,
+    email,
     unit,
     weight,
     challenge,
+    height,
+    heightUnit,
   };
 
   localStorage.setItem(
@@ -76,9 +122,12 @@ useEffect(() => {
   gender,
   name,
   whatsapp,
+  email,
   unit,
   weight,
   challenge,
+  height,
+  heightUnit,
 ]);
  
   const handleGoalSelect = (selectedGoal) => {
@@ -89,80 +138,151 @@ useEffect(() => {
     console.log(selectedGoal)
   };
 const nextStep = () => {
-  if (step === 4) {
+  if (step === 5) {
     if (name.trim() === "") {
       toast.error("Fadlan geli magacaaga!");
       return;
     }
-    setStep(5);
-    return;
-  }
-
-  if (step === 5) {
-    setStep(6); // birth -> height
+    setStep(6);
     return;
   }
 
   if (step === 6) {
-    setStep(7); // height -> weight
+    setStep(7);
     return;
   }
 
   if (step === 7) {
-    setStep(8); // weight -> whatsapp
+    setStep(8);
     return;
   }
 
-  if (step === 8) {
-  
   if (step === 8) {
     setStep(9);
     return;
   }
 
-    setStep(9); // whatsapp -> experience
-    return;
-  }
-
   if (step === 9) {
-    setStep(10); // experience -> challenge
+    setStep(10);
     return;
   }
-    if (step === 10) {
-    const error = validateWhatsApp(whatsapp);
 
-    if (error) {
-      toast.error(error);
+  if (step === 10) {
+    const waError = validateWhatsApp(whatsapp);
+    if (waError) {
+      toast.error(waError);
       return;
     }
 
-    navigate("/Loading");
+    const emError = validateEmail(email);
+    if (emError) {
+      setEmailError(emError);
+      toast.error(emError);
+      return;
+    }
+    setEmailError("");
+
+    const payload = {
+      name,
+      whatsapp,
+      email,
+      gender,
+      goal,
+      weight,
+      unit,
+      height,
+      height_unit: heightUnit,
+      challenge,
+      birth_date: birthDate
+    };
+
+    axios.post("http://localhost:5000/api/questionnaires", payload)
+      .then((res) => {
+        if (res.data && res.data.questionnaire_id) {
+          localStorage.setItem("questionnaire_id", res.data.questionnaire_id);
+          localStorage.setItem("client_id", res.data.client_id);
+        }
+      })
+      .catch((err) => {
+        console.warn("Questionnaire sync notice:", err.message);
+      })
+      .finally(() => {
+        navigate("/Loading");
+      });
     return;
   }
 };
+
+const validateEmail = (val) => {
+  if (!val || !val.trim()) {
+    return "Fadlan geli email-kaaga! (Email is required)";
+  }
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!regex.test(val.trim())) {
+    return "Fadlan geli email sax ah! (Invalid email address)";
+  }
+  return null;
+};
+
+const handleGoogleSignIn = async () => {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/Questions"
+      }
+    });
+    if (error) {
+      console.warn("Google OAuth popup fallback:", error.message);
+      const userGoogleEmail = prompt("Enter your Google Account email:");
+      if (userGoogleEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userGoogleEmail.trim())) {
+        setEmail(userGoogleEmail.trim());
+        setEmailError("");
+        toast.success("Google account email linked!");
+      }
+    }
+  } catch (err) {
+    console.warn("Google Sign In error:", err.message);
+  }
+};
+
 const validateWhatsApp = (number) => {
-  const cleaned = number.replace(/\s+/g, ""); // remove spaces
+  if (!number || !number.trim()) {
+    return "Fadlan geli lambarkaaga WhatsApp-ka!";
+  }
+
+  let cleaned = number.replace(/[\s\-\+\(\)]/g, ""); // remove spaces and symbols
+
+  if (cleaned.startsWith("0")) {
+    cleaned = cleaned.slice(1);
+  }
+
+  if (!cleaned.startsWith("252")) {
+    cleaned = "252" + cleaned;
+  }
 
   if (!/^\d+$/.test(cleaned)) {
     return "WhatsApp number waa inuu noqdaa tirooyin kaliya!";
   }
 
-  if (!cleaned.startsWith("25263")) {
-    return "WhatsApp number waa inuu ku bilaabmaa 25263!";
+  // Accepts Telesom (63), Somtel (65), Hormuud (61), Somtelecom (62), Golis (90)
+  const validPrefixes = ["25263", "25265", "25261", "25262", "25290", "25277"];
+  const isValidPrefix = validPrefixes.some((prefix) => cleaned.startsWith(prefix));
+
+  if (!isValidPrefix) {
+    return "Fadlan geli lambar sax ah (Telesom, Somtel, Hormuud, Golis ama Somtelecom)!";
   }
 
   if (cleaned.length !== 12) {
-    return "WhatsApp number waa inuu noqdaa 12 digit (25263XXXXXXX)!";
+    return "WhatsApp number waa inuu noqdaa 12 digit (e.g. 25263XXXXXXX ama 25265XXXXXXX)!";
   }
-  
+
   return "";
-  
 };
 
   const prevStep = () => {
     if (step > 1) setStep(step - 1);
   };
-  const navigate = useNavigate()
 
   return (
     <div className="q-wrapper">
@@ -198,7 +318,7 @@ const validateWhatsApp = (number) => {
                   onClick={() => handleGoalSelect("Misaan-kordhin")}
                 >
                   <img
-                    src="/images/img-4.jpg"
+                    src={gender === "Female" ? "/images/female-goal-1.png" : "/images/img-4.jpg"}
                     alt="Lose Fat"
                   />
                   <div className="q-overlay"></div>
@@ -213,7 +333,7 @@ const validateWhatsApp = (number) => {
                   onClick={() => handleGoalSelect("Muruq-dhissid")}
                 >
                   <img
-                    src="/images/img-3.jpg"
+                    src={gender === "Female" ? "/images/female-goal-2.png" : "/images/img-3.jpg"}
                     alt="Build Muscle"
                   />
                   <div className="q-overlay"></div>
@@ -228,7 +348,7 @@ const validateWhatsApp = (number) => {
                   onClick={() => handleGoalSelect("Jidh-Hagaajin")}
                 >
                   <img
-                    src="/images/img-4.jpg"
+                    src={gender === "Female" ? "/images/female-goal-3.png" : "/images/img-4.jpg"}
                     alt="Transform"
                   />
                   <div className="q-overlay"></div>
@@ -414,22 +534,46 @@ const validateWhatsApp = (number) => {
 
     <div className="height-card">
       <div className="unit-switch">
-        <button className="active">CM</button>
-        <button>FT/IN</button>
+        <button
+          className={heightUnit === "cm" ? "active" : ""}
+          onClick={() => {
+            if (heightUnit === "ft") {
+              setHeight(Math.round(height * 2.54));
+            }
+            setHeightUnit("cm");
+          }}
+        >
+          CM
+        </button>
+        <button
+          className={heightUnit === "ft" ? "active" : ""}
+          onClick={() => {
+            if (heightUnit === "cm") {
+              setHeight(Math.round(height / 2.54));
+            }
+            setHeightUnit("ft");
+          }}
+        >
+          FT/IN
+        </button>
       </div>
 
       <div className="height-display">
-        <h2>{height}</h2>
-        <span>CM</span>
+        <h2>
+          {heightUnit === "cm"
+            ? height
+            : `${Math.floor(height / 12)}'${height % 12}"`}
+        </h2>
+        <span>{heightUnit === "cm" ? "CM" : "FT/IN"}</span>
       </div>
 
       <input
         className="modern-range"
         type="range"
-        min="140"
-        max="220"
+        min={heightUnit === "cm" ? 140 : 55}
+        max={heightUnit === "cm" ? 220 : 87}
         value={height}
-        onChange={(e) => setHeight(e.target.value)}
+        onChange={(e) => setHeight(Number(e.target.value))}
       />
 
       <div className="modern-actions">
@@ -638,11 +782,67 @@ const validateWhatsApp = (number) => {
       />
     </div>
 
-    <div className="q-footer">
+    <div className="q-input-box" style={{ marginTop: "14px" }}>
+      <label>Email <span style={{ color: "#00ffa6", fontSize: "11px" }}>*</span></label>
+      <input
+        type="email"
+        placeholder="Enter your email"
+        value={email}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          if (emailError) setEmailError("");
+        }}
+        style={{ borderColor: emailError ? "#ff4d4f" : "" }}
+        required
+      />
+      {emailError && (
+        <span style={{ color: "#ff4d4f", fontSize: "12px", marginTop: "4px", display: "block", textAlign: "left" }}>
+          {emailError}
+        </span>
+      )}
+    </div>
+
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "16px 0 10px" }}>
+      <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.12)" }}></div>
+      <span style={{ color: "#8f9ca7", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px" }}>OR</span>
+      <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.12)" }}></div>
+    </div>
+
+    <button
+      type="button"
+      className="q-google-btn"
+      onClick={handleGoogleSignIn}
+      style={{
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "10px",
+        padding: "12px 16px",
+        background: "rgba(255, 255, 255, 0.05)",
+        border: "1px solid rgba(255, 255, 255, 0.15)",
+        borderRadius: "10px",
+        color: "#ffffff",
+        fontSize: "14px",
+        fontWeight: "600",
+        cursor: "pointer",
+        transition: "all 0.2s ease"
+      }}
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
+        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <div className="q-footer" style={{ marginTop: "20px" }}>
       <button className="q-back" onClick={prevStep}>
         ← Back
       </button>
-      <button className="q-next"onClick={nextStep} >
+      <button className="q-next" onClick={nextStep}>
         Continue →
       </button>
     </div>

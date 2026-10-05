@@ -15,7 +15,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('/images/image-1-back.jpeg'); 
+  background-image: url('/images/back-1.jpeg'); 
   background-size: cover;
   background-position: center;
   z-index: 1;
@@ -84,8 +84,38 @@
     /* height: 100vh;  this caused buttons to disapper beacuse text becomes bigger than the hompage*/ 
   font-size:4.5rem;
     font-weight: 900;
+    flex-wrap: wrap;
+    gap: 0;
     width: 100%;
  ;
+}
+.hero-dumbbell {
+   
+  margin-right:4px;
+  margin-top:0;
+  flex-shrink: 0;
+ 
+  font-size: 6rem;
+  color: #00d0ff;
+
+  /* glow effect */
+  color: #00d0ff;
+  
+}
+
+@keyframes dumbbellGlow {
+  from {
+    filter:
+      drop-shadow(0 0 6px #00d0ff)
+      drop-shadow(0 0 12px #00d0ff);
+  }
+
+  to {
+    filter:
+      drop-shadow(0 0 15px #00d0ff)
+      drop-shadow(0 0 30px #00d0ff)
+      drop-shadow(0 0 45px #00d0ff);
+  }
 }
 .hero-btn{
     display: flex;
@@ -354,9 +384,9 @@ line-height: 1.6;
 }
 .images-fix img{
   width: 100%;
-  max-height: 450px;
+  max-height: 550px;
   object-fit:contain;
-  border-radius: 20px;
+  border-radius: 30px;
 }
 /* slider style */
 .pro-slider-wrapper {
@@ -377,6 +407,8 @@ line-height: 1.6;
   position: relative;
   border-radius: 25px;
   overflow: hidden;
+  width: 100%;
+  height: 450px;
 }
 
 /* IMAGE */
@@ -777,6 +809,10 @@ line-height: 1.6;
     font-size: 4rem;
     padding: 0 10px;
   }
+
+
+
+
 
   .headlin-quess h2{
     font-size:19px;

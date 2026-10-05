@@ -107,6 +107,9 @@ body {
   letter-spacing: 3px;
   margin-bottom: 10px;
 }
+.admin-nav-item {
+  cursor: pointer;
+}
 
 /* RIGHT SIDE */
 

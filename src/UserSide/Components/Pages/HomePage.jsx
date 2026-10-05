@@ -3,11 +3,11 @@ import ShinyText from "../ShinyText";
 import './page.css'
 
 import Navbar from './Navbar'
-import { FaChartBar, FaHeadset, FaUtensils } from 'react-icons/fa';
+import { FaChartBar, FaDumbbell, FaHeadset, FaUtensils } from 'react-icons/fa';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
-import 'animate.css';
 import Testominal from '../Testominal';
+import NewsletterSection from '../NewsletterSection';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -43,8 +43,9 @@ const HomePage = () => {
   <div className='hero-back'></div>
 <div className='hero-content'>
      <div className='SHINNY-TEXT-ALIGN'>
+       <FaDumbbell className="hero-dumbbell" />
      <ShinyText
-  text="✨ Ma rabtaa in jidhkaagu muddo kooban isbeddelo ?"
+  text="Ma rabtaa in jidhkaagu muddo kooban isbeddelo ?"
   speed={2}
   delay={0}
   color="white"
@@ -160,11 +161,22 @@ const HomePage = () => {
         <p>Rebuilt strength and lost fat while maintaining performance.</p>
       </div>
     </div>
+    <div className="slide-item">
+      <img src="/images/bagii.jpeg" alt="slide" />
+      <div className="slide-overlay">
+        <span className="slide-tag">BODY RECOMP</span>
+        <h3>Jidh Cusub ⚡</h3>
+        <p>Rebuilt strength and lost fat while maintaining performance.</p>
+      </div>
+    </div>
   </Carousel>
 </div>
   
   </div>
      <Testominal/>
+     <div style={{ padding: "0 20px" }}>
+       <NewsletterSection />
+     </div>
    </>
   )
 }

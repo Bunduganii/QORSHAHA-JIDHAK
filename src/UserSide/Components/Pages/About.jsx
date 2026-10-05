@@ -1,6 +1,8 @@
 import React from "react";
 import "../Pages/About.css";
 import Navbar from "./Navbar";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { Carousel } from 'react-responsive-carousel';
 
 const About = () => {
   return (
@@ -38,9 +40,8 @@ const About = () => {
               </h2>
 
               <p>
-                Ka dib sanado badan oo tababar adag ah, waxaan ogaaday in dad badan
-                ay u tababaraan si khaldan. Dadku waxay raadiyaan qurux kaliya,
-                laakiin waxaan rabnaa awood dhab ah.
+               Nasir wuxuu safarkiisa ku bilaabay miisaan dhan 114kg, isagoo la tacaalaya baruur badan, 
+               gynecomastia (naso), iyo face fat si weyn u saameeyey kalsoonidiisa
               </p>
 
               <p>
@@ -66,6 +67,84 @@ const About = () => {
             </div>
           </div>
         </section>
+         
+        <div className="slider-sectionss">
+          <div className="pro-slider-wrapperss">
+           <Carousel
+             showThumbs={false}
+             showStatus={false}
+             infiniteLoop
+             autoPlay
+             interval={2000}
+             swipeable
+             emulateTouch
+             showIndicators={true}
+             showArrows={true}
+             className="custom-carousel"
+             renderArrowPrev={(clickHandler, hasPrev) =>
+               hasPrev && (
+                 <button className="circle-arrow left" onClick={clickHandler}>
+                   ❮
+                 </button>
+               )
+             }
+             renderArrowNext={(clickHandler, hasNext) =>
+               hasNext && (
+                 <button className="circle-arrow right" onClick={clickHandler}>
+                   ❯
+                 </button>
+               )
+             }
+           >
+             <div className="slide-itemss">
+               <img src="/images/about-1.jpeg" alt="slide" />
+              <div className="slide-overlay">
+        <span className="slide-tag">Cutting</span>
+        <h3>Cuttuing 1</h3>
+        <p>Lost 15kg in 12 weeks using our structured training + nutrition.</p>
+      </div>
+             </div>
+         
+             <div className="slide-itemss">
+               <img src="/images/about-2.jpeg" alt="slide" />
+                      <div className="slide-overlay">
+        <span className="slide-tag">Bulking</span>
+        <h3>Bulking</h3>
+       
+      </div>
+             </div>
+         
+             <div className="slide-itemss">
+               <img src="/images/about-3.jpeg" alt="slide" />
+                      <div className="slide-overlay">
+        <span className="slide-tag">Cutting</span>
+        <h3>Cuttuing 3</h3>
+        
+      </div>
+             </div>
+             <div className="slide-itemss">
+               <img src="/images/about-4.jpeg" alt="slide" />
+              
+             </div>
+             <div className="slide-itemss">
+               <img src="/images/about-5.jpeg" alt="slide" />
+                     <div className="slide-overlay">
+        <span className="slide-tag">Bulking</span>
+        <h3>Bulking 1</h3>
+       
+      </div>
+             </div>
+             <div className="slide-itemss">
+               <img src="/images/about-6.jpeg" alt="slide" />
+                     <div className="slide-overlay">
+        <span className="slide-tag">Cutting</span>
+        <h3>Cuttuing 2</h3>
+        <p>Lost 15kg in 12 weeks using our structured training + nutrition.</p>
+      </div>
+             </div>
+           </Carousel>
+         </div>
+        </div>
 
         {/* TIMELINE */}
         <section className="timeline-section">
@@ -76,8 +155,9 @@ const About = () => {
               <h3>2018</h3>
               <h4>Bilowgii Tababarka</h4>
               <p>
-                Waxaan bilaabay qorshe tababar oo adag, si aan dadka ugu dhiso jidh
-                xoog leh.
+                Go’aan adag iyo baadhitaan dheer kadib, wuxuu lumiyey 41kg muddo 7 bilood ah. 
+                Laakiin safarku halkaas kuma dhammaan — miisaankii markuu lumiyey ayuu aad u caatoobay
+                
               </p>
             </div>
 
@@ -85,7 +165,8 @@ const About = () => {
               <h3>2020</h3>
               <h4>BARNAAMIJKA ONLINE</h4>
               <p>
-                Waxaan bilownay tababar online ah si qof walba u helo fursad.
+               Muddo laba sano ah ayuu sameynayey qaladaad, tijaabooyin, bulking iyo 
+               cutting isdaba joog ah, ilaa uu ugu dambayn helay nidaamkii saxda ahaa ee jir dhisidda iyo maareynta jidhka.
               </p>
             </div>
 
@@ -93,7 +174,8 @@ const About = () => {
               <h3>2022</h3>
               <h4>KORRIIN IYO GUUL</h4>
               <p>
-                Dad badan ayaa ku guuleystay yoolkoodii, miisaan dhimis iyo xoog.
+               Maanta, Nasir wuxuu dadka kale ka caawiyaa dhibaatooyinkii uu soo maray, 
+               si aysan waqti ugu lumin khaladaad iyo baadhitaanno badan sida uu isagu sameeyey.
               </p>
             </div>
 
@@ -101,8 +183,8 @@ const About = () => {
               <h3>2026</h3>
               <h4>Qorshaha Jidhka Platform</h4>
               <p>
-                Waxaan kuu dhisnay bog casri ah oo kuugu diyaarinaya tababar casri ah,
-                cunto, iyo qorshe joogto ah.
+               Haddii aad rabto inaad si sax ah u dhisto jirkaaga adigoon ku wareerin xog badan iyo tijaabooyin aan dhammaad lahayn, 
+               Nasir wuxuu kuu diyaariyey qorshe ku saleysan waayo-aragnimo dhab ah iyo natiijo muuqata
               </p>
 
               <button className="timeline-btn">Bilow Hadda</button>

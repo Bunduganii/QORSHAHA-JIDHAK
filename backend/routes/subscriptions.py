@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request
 from ..database import SessionLocal
 from ..models import EmailSubscription, Questionnaire, Payment
 
-subscriptions_bp = Blueprint("subscriptions", __name__, url_prefix="/api")
+subscriptions_bp = Blueprint("subscriptions", __name__, url_prefix="/api" )
 
 EMAIL_REGEX = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
 

@@ -55,12 +55,12 @@ class SifaloService:
         }
 
         try:
-            # Sifalo may hold open connection for USSD PIN entry (up to 120s)
+            # Sifalo initiates USSD PIN push (short timeout so UI gets pending status immediately)
             response = requests.post(
                 Config.SIFALO_URL,
                 json=payload,
                 headers=headers,
-                timeout=120
+                timeout=15
             )
             response_data = response.json() if response.content else {}
             code = str(response_data.get("code", ""))

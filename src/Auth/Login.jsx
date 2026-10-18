@@ -34,6 +34,22 @@ const handleLogin = async (e) => {
   
 
 }
+  const handleGoogleSignIn = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin + "/Questions"
+        }
+      });
+      if (error) {
+        toast.error("Google login: " + error.message);
+      }
+    } catch (err) {
+      toast.error("Google Sign-In failed.");
+    }
+  };
+
   return (
     <div className="login-signup">
       {/* LEFT SIDE - IMAGE WITH OVERLAY */}
@@ -92,10 +108,12 @@ const handleLogin = async (e) => {
         <div className="social-login">
           <p>OR CONTINUE WITH</p>
           <div className="social-buttons">
-            
-            <button className="google-btn"><FcGoogle className='icon'/>
+            <button type="button" className="google-btn" onClick={handleGoogleSignIn}>
+              <FcGoogle className='icon'/>
             </button>
-            <button className="apple-btn"><FaApple className='icon'/></button>
+            <button type="button" className="apple-btn" onClick={() => toast("Apple Sign-In coming soon!", { icon: "" })}>
+              <FaApple className='icon'/>
+            </button>
           </div>
         </div>
 

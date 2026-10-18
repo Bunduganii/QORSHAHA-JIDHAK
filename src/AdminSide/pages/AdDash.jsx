@@ -15,8 +15,12 @@ import toast from "react-hot-toast";
 import {
   FaSearch, FaKey, FaUserCheck, FaTimes, FaCheck, FaSync,
   FaChartLine, FaMoneyBillWave, FaEnvelope, FaNewspaper, FaDumbbell,
-  FaShieldAlt, FaSpinner, FaExternalLinkAlt
+  FaShieldAlt, FaSpinner, FaExternalLinkAlt, FaUsers, FaArrowUp, FaCoins, FaWallet
 } from "react-icons/fa";
+import {
+  ResponsiveContainer, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, Tooltip, Legend
+} from "recharts";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard"); // 'dashboard' | 'payments' | 'articles' | 'emails'
@@ -469,41 +473,140 @@ const Dashboard = () => {
               </div>
             )}
 
-            {/* TOP STATS ROW */}
+            {/* TOP EXECUTIVE BOX METRICS & DYNAMIC RECHARTS */}
             {activeTab === "dashboard" && (
-              <section className="stats-row">
-                <div className="stat-card">
-                  <div className="stat-icon dollar">$</div>
-                  <div>
-                    <p>WADARTA LACAGTA (USD)</p>
-                    <h2>${stats.totalRevenueUSD.toLocaleString()}</h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                {/* 6 EXECUTIVE METRIC BOX CARDS */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "18px" }}>
+                  {/* CARD 1: USD REVENUE */}
+                  <div style={{
+                    background: "linear-gradient(135deg, rgba(0, 217, 255, 0.08), rgba(0, 0, 0, 0.4))",
+                    border: "1px solid rgba(0, 217, 255, 0.3)",
+                    borderRadius: "16px", padding: "20px",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.4)"
+                  }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                      <span style={{ fontSize: "11px", fontWeight: "900", color: "#8f9ca7", letterSpacing: "1px", textTransform: "uppercase" }}>TOTAL REVENUE (USD)</span>
+                      <div style={{ background: "rgba(0, 217, 255, 0.15)", color: "#00d9ff", padding: "6px 10px", borderRadius: "8px", fontSize: "14px" }}><FaMoneyBillWave /></div>
+                    </div>
+                    <h2 style={{ fontSize: "28px", fontWeight: "900", color: "#00d9ff", margin: "0 0 6px" }}>${stats.totalRevenueUSD.toLocaleString()}</h2>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#00ffa6" }}>
+                      <FaArrowUp size={10} /> <span>Live Supabase &amp; Sifalo Sync</span>
+                    </div>
+                  </div>
+
+                  {/* CARD 2: SLSH CASH REVENUE */}
+                  <div style={{
+                    background: "linear-gradient(135deg, rgba(0, 255, 166, 0.08), rgba(0, 0, 0, 0.4))",
+                    border: "1px solid rgba(0, 255, 166, 0.3)",
+                    borderRadius: "16px", padding: "20px",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.4)"
+                  }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                      <span style={{ fontSize: "11px", fontWeight: "900", color: "#8f9ca7", letterSpacing: "1px", textTransform: "uppercase" }}>TOTAL CASH (SLSH)</span>
+                      <div style={{ background: "rgba(0, 255, 166, 0.15)", color: "#00ffa6", padding: "6px 10px", borderRadius: "8px", fontSize: "14px" }}><FaCoins /></div>
+                    </div>
+                    <h2 style={{ fontSize: "28px", fontWeight: "900", color: "#00ffa6", margin: "0 0 6px" }}>{stats.totalRevenueCash.toLocaleString()} <span style={{ fontSize: "14px" }}>SLSH</span></h2>
+                    <div style={{ fontSize: "12px", color: "#8f9ca7" }}>Zaad &amp; eDahab Mobile Cash</div>
+                  </div>
+
+                  {/* CARD 3: REGISTERED CLIENTS */}
+                  <div style={{
+                    background: "linear-gradient(135deg, rgba(255, 193, 7, 0.08), rgba(0, 0, 0, 0.4))",
+                    border: "1px solid rgba(255, 193, 7, 0.3)",
+                    borderRadius: "16px", padding: "20px",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.4)"
+                  }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                      <span style={{ fontSize: "11px", fontWeight: "900", color: "#8f9ca7", letterSpacing: "1px", textTransform: "uppercase" }}>TOTAL CLIENTS</span>
+                      <div style={{ background: "rgba(255, 193, 7, 0.15)", color: "#ffc107", padding: "6px 10px", borderRadius: "8px", fontSize: "14px" }}><FaUsers /></div>
+                    </div>
+                    <h2 style={{ fontSize: "28px", fontWeight: "900", color: "#fff", margin: "0 0 6px" }}>{stats.totalClients}</h2>
+                    <div style={{ fontSize: "12px", color: "#ffc107" }}>Questionnaire Submissions</div>
+                  </div>
+
+                  {/* CARD 4: SUCCESSFUL PAID CLIENTS */}
+                  <div style={{
+                    background: "linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(0, 0, 0, 0.4))",
+                    border: "1px solid rgba(168, 85, 247, 0.3)",
+                    borderRadius: "16px", padding: "20px",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.4)"
+                  }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                      <span style={{ fontSize: "11px", fontWeight: "900", color: "#8f9ca7", letterSpacing: "1px", textTransform: "uppercase" }}>PAID CLIENTS</span>
+                      <div style={{ background: "rgba(168, 85, 247, 0.15)", color: "#a855f7", padding: "6px 10px", borderRadius: "8px", fontSize: "14px" }}><FaShieldAlt /></div>
+                    </div>
+                    <h2 style={{ fontSize: "28px", fontWeight: "900", color: "#a855f7", margin: "0 0 6px" }}>{stats.paidClients || payments.filter(p => p.payment_status === "PAID").length}</h2>
+                    <div style={{ fontSize: "12px", color: "#a855f7" }}>Active Coaching Access Granted</div>
                   </div>
                 </div>
 
-                <div className="stat-card">
-                  <div className="stat-icon cash">SL</div>
-                  <div>
-                    <p>WADARTA CASH (SLSH)</p>
-                    <h2>{stats.totalRevenueCash.toLocaleString()} <span style={{ fontSize: "13px" }}>SLSH</span></h2>
+                {/* DYNAMIC RECHARTS ROW */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "20px" }}>
+                  {/* CHART 1: PAYMENT GATEWAY DISTRIBUTION (DONUT / PIE CHART) */}
+                  <div style={{
+                    background: "rgba(13, 28, 41, 0.8)",
+                    border: "1px solid rgba(0, 217, 255, 0.2)",
+                    borderRadius: "18px", padding: "22px",
+                    boxShadow: "0 10px 35px rgba(0,0,0,0.5)"
+                  }}>
+                    <h3 style={{ color: "#fff", fontSize: "15px", fontWeight: "900", marginBottom: "4px", display: "flex", alignItems: "center", gap: "8px" }}>
+                      <FaWallet color="#00d9ff" /> PAYMENT GATEWAY SHARE
+                    </h3>
+                    <p style={{ color: "#8f9ca7", fontSize: "12px", marginBottom: "16px" }}>Calculated live breakdown across mobile gateways</p>
+                    
+                    <div style={{ width: "100%", height: "220px" }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={Object.entries(stats.methodCounts || {}).map(([name, value]) => ({ name, value }))}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={55}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                          >
+                            {Object.entries(stats.methodCounts || {}).map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={["#00d9ff", "#00ffa6", "#ffc107", "#a855f7", "#ff4d4f"][index % 5]} />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            contentStyle={{ background: "#0b1722", border: "1px solid #00d9ff", borderRadius: "8px", color: "#fff", fontSize: "12px" }}
+                          />
+                          <Legend wrapperStyle={{ fontSize: "11px", color: "#8f9ca7" }} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
-                </div>
 
-                <div className="stat-card">
-                  <div className="stat-icon users">👥</div>
-                  <div>
-                    <p>MACMIISHA DIIWAANGASHAN</p>
-                    <h2>{stats.totalClients}</h2>
-                  </div>
-                </div>
+                  {/* CHART 2: COACHING PLAN POPULARITY (BAR CHART) */}
+                  <div style={{
+                    background: "rgba(13, 28, 41, 0.8)",
+                    border: "1px solid rgba(0, 255, 166, 0.2)",
+                    borderRadius: "18px", padding: "22px",
+                    boxShadow: "0 10px 35px rgba(0,0,0,0.5)"
+                  }}>
+                    <h3 style={{ color: "#fff", fontSize: "15px", fontWeight: "900", marginBottom: "4px", display: "flex", alignItems: "center", gap: "8px" }}>
+                      <FaDumbbell color="#00ffa6" /> PLAN POPULARITY BREAKDOWN
+                    </h3>
+                    <p style={{ color: "#8f9ca7", fontSize: "12px", marginBottom: "16px" }}>Subscriptions per fitness coaching tier</p>
 
-                <div className="stat-card">
-                  <div className="stat-icon active-c">⚡</div>
-                  <div>
-                    <p>LACAG BIXINTOODU GUULEYSATAY</p>
-                    <h2>{stats.paidClients}</h2>
+                    <div style={{ width: "100%", height: "220px" }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={Object.entries(stats.planCounts || {}).map(([name, value]) => ({ name: name.replace("Plan", "").trim(), value }))}>
+                          <XAxis dataKey="name" stroke="#8f9ca7" fontSize={11} tickLine={false} />
+                          <YAxis stroke="#8f9ca7" fontSize={11} tickLine={false} allowDecimals={false} />
+                          <Tooltip
+                            contentStyle={{ background: "#0b1722", border: "1px solid #00ffa6", borderRadius: "8px", color: "#fff", fontSize: "12px" }}
+                          />
+                          <Bar dataKey="value" fill="#00ffa6" radius={[6, 6, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                 </div>
-              </section>
+              </div>
             )}
 
             {/* PAYMENTS SEARCH, FILTER & TABLE */}

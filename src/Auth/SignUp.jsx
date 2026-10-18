@@ -31,7 +31,23 @@ const SignUp = () => {
     }
     setLoading(false)
    }
-   return (
+  const handleGoogleSignIn = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin + "/Questions"
+        }
+      });
+      if (error) {
+        toast.error("Google signup: " + error.message);
+      }
+    } catch (err) {
+      toast.error("Google Sign-In failed.");
+    }
+  };
+
+  return (
     <div className="login-signup">
       {/* LEFT SIDE - IMAGE WITH OVERLAY */}
       <div className="side-image">
@@ -74,9 +90,6 @@ const SignUp = () => {
             <label className="remember">
               <input type="checkbox" /> Remember me for 30 days
             </label>
-            {/* <Link to="/forgot-password" className="forgot-link">
-              Forgot Password?
-            </Link> */}
           </div>
 
           <button type="submit" className="signin-btn" disabled={loading}>
@@ -91,9 +104,12 @@ const SignUp = () => {
         <div className="social-login">
           <p>OR CONTINUE WITH</p>
           <div className="social-buttons">
-            <button className="google-btn"><FcGoogle className='icon'/>
-                       </button>
-                       <button className="apple-btn"><FaApple className='icon'/></button>
+            <button type="button" className="google-btn" onClick={handleGoogleSignIn}>
+              <FcGoogle className='icon'/>
+            </button>
+            <button type="button" className="apple-btn" onClick={() => toast("Apple Sign-In coming soon!", { icon: "" })}>
+              <FaApple className='icon'/>
+            </button>
           </div>
         </div>
 

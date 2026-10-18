@@ -288,7 +288,9 @@ const MobileForm = () => {
     if (cleanPhone.startsWith("0")) cleanPhone = cleanPhone.slice(1);
     const accountPayload = cleanPhone.startsWith("252") ? cleanPhone : "252" + cleanPhone;
 
-    toast.loading("Codsiga lacag bixinta waa la dirayaa... 📱", { id: "payment-toast" });
+    // Show USSD PIN overlay modal immediately so user sees phone instructions straight away
+    setUssdOpen(true);
+    toast.loading("Codsiga lacag bixinta waxaa loo diray talifoonkaaga (+252 " + paymentPhone + ")... 📱", { id: "payment-toast" });
 
     try {
       const res = await axios.post(`${API}/payments/create`, {
@@ -298,33 +300,40 @@ const MobileForm = () => {
         payment_phone:  accountPayload,
         email:          userData.email || "",
         currency,
-      }, { timeout: 130000 });
+      }, { timeout: 30000 });
 
       toast.dismiss("payment-toast");
 
       if (res.data?.success && res.data?.status === "PAID") {
         handlePaidResult(res.data);
 
-      } else if (res.data?.pending || res.data?.status === "PENDING") {
-        /* ── USSD Push sent — show modal + start polling ── */
+      } else if (res.data?.pending || res.data?.status === "PENDING" || res.data?.order_id) {
+        /* ── USSD Push sent — start polling ── */
         setUssdOrderId(res.data.order_id);
         setUssdSid(res.data.sid || null);
-        setUssdOpen(true);
         startPolling(res.data.order_id, res.data.sid);
 
       } else if (res.data?.status === "PAYMENT_REVIEW") {
+        setUssdOpen(false);
         setSubmitting(false);
         toast("Lacag bixintaada waxaa lagu hubinayaa. Fadlan la xiriir Coach.", { icon: "⏳", duration: 6000 });
 
       } else {
+        setUssdOpen(false);
         setSubmitting(false);
         toast.error(res.data?.message || "Lacagta ma aadan bixin. Isku day mar kale.", { id: "payment-toast" });
       }
     } catch (err) {
       toast.dismiss("payment-toast");
-      setSubmitting(false);
       const msg = err.response?.data?.message || err.response?.data?.error || err.message;
-      toast.error(typeof msg === "object" ? JSON.stringify(msg) : String(msg || "Khalad baa dhacay."), { id: "payment-toast" });
+      // If error is timeout, keep modal open and continue auto-polling if we have order_id or fallback
+      if (err.code === "ECONNABORTED" || String(msg).toLowerCase().includes("timeout")) {
+        toast("Codsiga USSD wuu socdaa talifoonkaaga. Geli PIN-kaaga.", { icon: "📱", id: "payment-toast" });
+      } else {
+        setUssdOpen(false);
+        setSubmitting(false);
+        toast.error(typeof msg === "object" ? JSON.stringify(msg) : String(msg || "Khalad baa dhacay."), { id: "payment-toast" });
+      }
     }
   };
 

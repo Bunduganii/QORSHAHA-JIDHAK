@@ -95,7 +95,12 @@ useEffect(()=>{
     }
 },[])
   const storyBook = gender === "Female" ? femaleStories : maleStories;
-  const selectedStory = storyBook[goal] || null;
+  const defaultStory = {
+    image: "/images/khalid-slide.jpeg",
+    name: "Khaalid",
+    result: "Waxaan Kordhiyey 8kg 2 bilood gudahood"
+  };
+  const selectedStory = storyBook[goal] || defaultStory;
 
 useEffect(() => {
   const formData = {
